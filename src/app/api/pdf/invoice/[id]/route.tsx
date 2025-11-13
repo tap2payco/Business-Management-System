@@ -78,7 +78,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
     // Try Puppeteer/HTML template first
     try {
-      const pdfBuffer = await renderPdfFromTemplate('invoice', pdfData);
+    const pdfBuffer = await renderPdfFromTemplate('invoice', pdfData);
   return new Response(new Uint8Array(pdfBuffer), {
         status: 200,
         headers: {

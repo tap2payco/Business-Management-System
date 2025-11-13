@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 24
+    marginBottom: 24,
   },
   brand: {
     flexDirection: 'row',
@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 50,
     marginRight: 12,
-    marginBottom: 4
+    marginBottom: 4,
   },
   businessInfo: {
     flex: 1
@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
   businessName: {
     fontSize: 18,
     fontWeight: '700',
-    marginBottom: 2
+    marginBottom: 2,
   },
   businessMeta: {
     fontSize: 9,
@@ -82,44 +82,44 @@ const styles = StyleSheet.create({
   invoiceTitle: {
     fontSize: 20,
     fontWeight: '700',
-    marginBottom: 1
+    marginBottom: 1,
   },
   invoiceNum: {
     fontSize: 11,
     color: '#666',
-    marginBottom: 6
+    marginBottom: 6,
   },
   invoiceDates: {
     fontSize: 9,
     color: '#555'
   },
   section: {
-    marginBottom: 16
+    marginBottom: 16,
   },
   sectionDivider: {
-    marginBottom: 2
+    marginBottom: 2,
   },
   twoCol: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 8
+    marginBottom: 8,
   },
   billBox: {
     flex: 1,
-    marginRight: 16
+    marginRight: 16,
   },
   billTitle: {
     fontSize: 11,
     fontWeight: '700',
-    marginBottom: 4
+    marginBottom: 4,
   },
   billContent: {
     fontSize: 10,
-    lineHeight: 1.3
+    lineHeight: 1.3,
   },
   table: {
     marginTop: 12,
-    marginBottom: 12
+    marginBottom: 12,
   },
   tableHeader: {
     flexDirection: 'row',
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: 6,
     paddingVertical: 7,
-    borderBottom: '0.5pt solid #e8e8e8'
+    borderBottom: '0.5pt solid #e8e8e8',
   },
   colDesc: { flex: 3, paddingRight: 6 },
   colQty: { flex: 0.8, textAlign: 'right', paddingRight: 4 },
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
   colTotal: { flex: 1, textAlign: 'right' },
   totalsContainer: {
     marginTop: 12,
-    paddingTop: 6
+    paddingTop: 6,
   },
   totalsRow: {
     flexDirection: 'row',
@@ -156,17 +156,17 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     borderTop: '1pt solid #ddd',
     paddingTop: 6,
-    marginTop: 2
+    marginTop: 2,
   },
   notes: {
     marginTop: 16,
     fontSize: 9,
     paddingTop: 8,
-    borderTop: '0.5pt solid #e8e8e8'
+    borderTop: '0.5pt solid #e8e8e8',
   },
   notesTitle: {
     fontWeight: '700',
-    marginBottom: 3
+    marginBottom: 3,
   }
 });
 

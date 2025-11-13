@@ -2,7 +2,17 @@
 import { prisma } from '@/lib/prisma';
 export const dynamic = 'force-dynamic';
 export default async function InvoicesPage() {
-  const invoices = await prisma.invoice.findMany({ orderBy: { createdAt: 'desc' }, take: 50 });
+  // Fetch session to get businessId
+  const { auth } = await import('@/auth');
+  const session = await auth();
+  if (!session?.user?.businessId) {
+    return <div className="p-8">Unauthorized: No business found.</div>;
+  }
+  const invoices = await prisma.invoice.findMany({
+    where: { businessId: session.user.businessId },
+    orderBy: { createdAt: 'desc' },
+    take: 50
+  });
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">

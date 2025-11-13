@@ -53,7 +53,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
   try {
     const pdfBuffer = await renderPdfFromTemplate('receipt', pdfData);
-    return new Response(new Uint8Array(pdfBuffer), {
+  return new Response(new Uint8Array(pdfBuffer), {
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',

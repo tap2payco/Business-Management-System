@@ -11,6 +11,7 @@ export default function SignUpPage() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [businessName, setBusinessName] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -28,6 +29,7 @@ export default function SignUpPage() {
           name,
           phone,
           password,
+          businessName,
         }),
       });
 
@@ -48,8 +50,9 @@ export default function SignUpPage() {
         throw new Error(signInResult.error);
       }
 
-      router.push("/");
-      router.refresh();
+  router.push("/");
+  // Force a hard reload to ensure session is refreshed and businessId is present
+  window.location.reload();
     } catch (error) {
       setError(error instanceof Error ? error.message : "Something went wrong");
     } finally {
@@ -115,6 +118,20 @@ export default function SignUpPage() {
             />
           </div>
 
+          <div className="mb-6">
+            <label htmlFor="businessName" className="block text-sm font-medium text-gray-700 mb-1">
+              Business Name
+            </label>
+            <input
+              id="businessName"
+              type="text"
+              value={businessName}
+              onChange={(e) => setBusinessName(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+              required
+              placeholder="Enter your business name"
+            />
+          </div>
           <button
             type="submit"
             className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"

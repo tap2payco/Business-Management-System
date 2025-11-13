@@ -3,7 +3,7 @@ import Handlebars from 'handlebars';
 import fs from 'fs/promises';
 import path from 'path';
 
-export async function renderPdfFromTemplate(templateName: string, data: any): Promise<Buffer> {
+export async function renderPdfFromTemplate(templateName: string, data: any): Promise<Uint8Array> {
   const templatePath = path.join(process.cwd(), 'templates', `${templateName}.html`);
   const htmlSrc = await fs.readFile(templatePath, 'utf8');
   const template = Handlebars.compile(htmlSrc);
@@ -14,5 +14,5 @@ export async function renderPdfFromTemplate(templateName: string, data: any): Pr
   await page.setContent(html, { waitUntil: 'networkidle0' });
   const pdfBuffer = await page.pdf({ format: 'A4', printBackground: true });
   await browser.close();
-  return pdfBuffer;
+  return new Uint8Array(pdfBuffer);
 }

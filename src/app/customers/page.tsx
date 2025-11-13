@@ -18,15 +18,16 @@ export default function CustomersPage() {
     async function fetchCustomers() {
       try {
         const res = await fetch('/api/customers');
+        if (!res.ok) throw new Error('Unauthorized or error fetching customers');
         const data = await res.json();
         setCustomers(data);
       } catch (error) {
+        setCustomers([]);
         console.error('Failed to fetch customers:', error);
       } finally {
         setLoading(false);
       }
     }
-
     fetchCustomers();
   }, []);
 

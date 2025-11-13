@@ -19,15 +19,16 @@ export default function ExpensesPage() {
     async function fetchExpenses() {
       try {
         const res = await fetch('/api/expenses');
+        if (!res.ok) throw new Error('Unauthorized or error fetching expenses');
         const data = await res.json();
         setExpenses(data);
       } catch (error) {
+        setExpenses([]);
         console.error('Failed to fetch expenses:', error);
       } finally {
         setLoading(false);
       }
     }
-
     fetchExpenses();
   }, []);
 

@@ -50,9 +50,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ],
   callbacks: {
     async jwt({ token, user }) {
+      // Always fetch user from DB to ensure businessId is present
+      let dbUser = null;
       if (user) {
-        token.phone = (user as User).phone;
-        token.businessId = (user as User).businessId;
+        dbUser = user;
+      } else if (token.sub) {
+        dbUser = await prisma.user.findUnique({ where: { id: token.sub } });
+      }
+      if (dbUser) {
+        token.phone = dbUser.phone;
+        token.businessId = dbUser.businessId;
       }
       return token;
     },

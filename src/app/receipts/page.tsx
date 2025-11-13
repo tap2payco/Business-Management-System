@@ -1,7 +1,23 @@
 
 import { prisma } from '@/lib/prisma';
 export default async function ReceiptsPage(){
-  const receipts = await prisma.receipt.findMany({ orderBy: { issuedAt: 'desc' }, include: { payment: { include: { invoice: true } } } });
+  // Fetch session to get businessId
+  const { auth } = await import('@/auth');
+  const session = await auth();
+  if (!session?.user?.businessId) {
+    return <div className="p-8">Unauthorized: No business found.</div>;
+  }
+  const receipts = await prisma.receipt.findMany({
+    orderBy: { issuedAt: 'desc' },
+    include: { payment: { include: { invoice: true } } },
+    where: {
+      payment: {
+        invoice: {
+          businessId: session.user.businessId
+        }
+      }
+    }
+  });
   return (
     <div className='space-y-4'>
       <div className='flex justify-between items-center'>

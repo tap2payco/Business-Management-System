@@ -24,15 +24,16 @@ export default function PaymentsPage() {
     async function fetchPayments() {
       try {
         const res = await fetch('/api/payments');
+        if (!res.ok) throw new Error('Unauthorized or error fetching payments');
         const data = await res.json();
         setPayments(data);
       } catch (error) {
+        setPayments([]);
         console.error('Failed to fetch payments:', error);
       } finally {
         setLoading(false);
       }
     }
-
     fetchPayments();
   }, []);
 

@@ -41,6 +41,12 @@ Return ONLY valid JSON with this exact structure:
       return NextResponse.json({ error: 'AI provider not configured' }, { status: 500 });
     }
 
+    console.log('Attempting AI draft with model:', DEFAULT_LLM);
+    console.log('LLM client config:', {
+      apiKey: llm.apiKey ? '***' : 'not set',
+      baseURL: llm.baseURL
+    });
+
     const completion = await llm.chat.completions.create({
       model: DEFAULT_LLM,
       temperature: 0.2,

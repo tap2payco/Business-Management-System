@@ -11,17 +11,42 @@ export default function NewItemPage() {
     setLoading(true);
     setError('');
     try {
+      // Client-side validation
+      if (!form.name || !form.name.trim()) {
+        throw new Error('Name is required');
+      }
+      const unitPriceNum = Number(form.unitPrice);
+      if (Number.isNaN(unitPriceNum) || unitPriceNum <= 0) {
+        throw new Error('Unit Price must be a positive number');
+      }
+      // taxRate is optional; default to 0 when empty
+      const taxRateNum = form.taxRate === '' ? 0 : Number(form.taxRate);
+      if (Number.isNaN(taxRateNum) || taxRateNum < 0 || taxRateNum > 1) {
+        throw new Error('Tax Rate must be a number between 0 and 1');
+      }
+
       const res = await fetch('/api/items', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: form.name,
-          description: form.description,
-          unitPrice: Number(form.unitPrice),
-          taxRate: Number(form.taxRate)
+          name: form.name.trim(),
+          description: form.description || null,
+          unitPrice: unitPriceNum,
+          taxRate: taxRateNum
         })
       });
-      if (!res.ok) throw new Error('Failed to create item');
+
+      // If the server returns a validation error, surface it to the user
+      if (!res.ok) {
+        let data: any = null;
+        try {
+          data = await res.json();
+        } catch (err) {
+          // ignore
+        }
+        const serverMessage = data?.error || (data?.details ? JSON.stringify(data.details) : null) || 'Failed to create item';
+        throw new Error(serverMessage);
+      }
       window.location.href = '/items';
     } catch (err: any) {
       setError(err.message || 'Error creating item');

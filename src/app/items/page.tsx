@@ -18,15 +18,16 @@ export default function ItemsPage() {
     async function fetchItems() {
       try {
         const res = await fetch('/api/items');
+        if (!res.ok) throw new Error('Unauthorized or error fetching items');
         const data = await res.json();
         setItems(data);
       } catch (error) {
+        setItems([]);
         console.error('Failed to fetch items:', error);
       } finally {
         setLoading(false);
       }
     }
-
     fetchItems();
   }, []);
 
