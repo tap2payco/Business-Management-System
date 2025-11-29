@@ -53,6 +53,19 @@ export function serializeBusiness(b: any) {
   };
 }
 
+export function serializeCustomer(c: any) {
+  return {
+    id: c.id,
+    name: c.name,
+    email: c.email ?? null,
+    phone: c.phone ?? null,
+    address: c.address ?? null,
+    createdAt: c.createdAt ? new Date(c.createdAt).toISOString() : null,
+    updatedAt: c.updatedAt ? new Date(c.updatedAt).toISOString() : null
+  };
+}
+
+
 export function serializeInvoiceSummary(inv: any) {
   // A compact invoice summary safe to send to the client
   return {

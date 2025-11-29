@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Invoice {{number}}</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
@@ -138,7 +139,7 @@
         </table>
       </div>
       {{#if business.logo}}
-        <img src="{{business.logo}}" class="logo" />
+        <img src="{{business.logo}}" class="logo" alt="Business Logo" />
       {{/if}}
       <div class="meta">
         <div><strong>Invoice #</strong> {{number}}</div>

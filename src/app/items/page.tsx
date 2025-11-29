@@ -57,62 +57,77 @@ export default function ItemsPage() {
         </button>
       </div>
 
-      <div className="rounded-lg border bg-white">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                  Name
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                  Description
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
-                  Unit Price
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
-                  Tax Rate
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {items.map((item) => (
-                <tr key={item.id} className="hover:bg-gray-50">
-                  <td className="whitespace-nowrap px-6 py-4">
-                    <div className="text-sm font-medium text-gray-900">
-                      {item.name}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="text-sm text-gray-500">
-                      {item.description || '-'}
-                    </div>
-                  </td>
-                  <td className="whitespace-nowrap px-6 py-4 text-right">
-                    <div className="text-sm font-medium text-gray-900">
-                      TZS {item.unitPrice.toLocaleString()}
-                    </div>
-                  </td>
-                  <td className="whitespace-nowrap px-6 py-4 text-right">
-                    <div className="text-sm text-gray-900">
-                      {(item.taxRate * 100).toFixed(1)}%
-                    </div>
-                  </td>
-                  <td className="whitespace-nowrap px-6 py-4 text-right text-sm">
-                    <button className="text-indigo-600 hover:text-indigo-900">
-                      Edit
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {items.length === 0 ? (
+        <div className="rounded-lg border bg-white p-12 text-center">
+          <p className="text-gray-600">No items yet. Create your first item to get started.</p>
+          <button
+            className="mt-4 rounded-lg bg-gray-900 px-4 py-2 text-white hover:bg-gray-800"
+            onClick={() => window.location.href = '/items/new'}
+          >
+            Add Item
+          </button>
         </div>
-      </div>
+      ) : (
+        <div className="rounded-lg border bg-white">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    Name
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    Description
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
+                    Unit Price
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
+                    Tax Rate
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {items.map((item) => (
+                  <tr key={item.id} className="hover:bg-gray-50">
+                    <td className="whitespace-nowrap px-6 py-4">
+                      <div className="text-sm font-medium text-gray-900">
+                        {item.name}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-sm text-gray-500">
+                        {item.description || '-'}
+                      </div>
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4 text-right">
+                      <div className="text-sm font-medium text-gray-900">
+                        TZS {item.unitPrice.toLocaleString()}
+                      </div>
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4 text-right">
+                      <div className="text-sm text-gray-900">
+                        {(item.taxRate * 100).toFixed(1)}%
+                      </div>
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4 text-right text-sm">
+                      <button 
+                        onClick={() => window.location.href = `/items/${item.id}/edit`}
+                        className="text-indigo-600 hover:text-indigo-900"
+                      >
+                        Edit
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

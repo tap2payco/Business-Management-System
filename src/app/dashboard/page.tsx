@@ -35,6 +35,11 @@ interface DashboardStats {
     category: string;
     amount: number;
   }>;
+  topSellingItems: Array<{
+    name: string;
+    quantity: number;
+    amount: number;
+  }>;
 }
 
 const summaryCards = (stats: DashboardStats) => [
@@ -209,6 +214,49 @@ export default function DashboardPage() {
                 />
               </LineChart>
             </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* Top Expenses by Category */}
+        <div className="rounded-xl border bg-white p-6 shadow-sm">
+          <h2 className="font-semibold">Top Expenses</h2>
+          <p className="text-sm text-gray-500">By category</p>
+          <div className="mt-4 h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={stats.topExpenses} layout="vertical">
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis type="number" />
+                <YAxis dataKey="category" type="category" width={100} />
+                <Tooltip formatter={(value: number) => `TZS ${value.toLocaleString()}`} />
+                <Bar dataKey="amount" fill="#ef4444" name="Amount" radius={[0, 4, 4, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Top Selling Items */}
+        <div className="rounded-xl border bg-white shadow-sm">
+          <div className="border-b p-6">
+            <h2 className="font-semibold">Top Selling Items</h2>
+            <p className="text-sm text-gray-500">Best performing products/services</p>
+          </div>
+          <div className="divide-y">
+            {stats.topSellingItems?.map((item, i) => (
+              <div key={i} className="flex items-center justify-between p-6">
+                <div>
+                  <p className="font-medium">{item.name}</p>
+                  <p className="text-sm text-gray-500">{item.quantity} sold</p>
+                </div>
+                <span className="font-medium text-gray-900">
+                  TZS {item.amount.toLocaleString()}
+                </span>
+              </div>
+            ))}
+            {(!stats.topSellingItems || stats.topSellingItems.length === 0) && (
+              <div className="p-6 text-center text-gray-500">No sales data available</div>
+            )}
           </div>
         </div>
       </div>

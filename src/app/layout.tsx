@@ -2,6 +2,7 @@
 import './globals.css';
 import { AuthenticatedLayout } from '@/components/AuthenticatedLayout';
 import { AuthProvider } from '@/components/AuthProvider';
+import { ToastProvider } from '@/components/Toast';
 import { auth } from '@/auth';
 
 export const metadata = { 
@@ -20,11 +21,14 @@ export default async function RootLayout({
     <html lang="en" className="dark">
       <body>
         <AuthProvider session={session}>
-          <AuthenticatedLayout>
-            {children}
-          </AuthenticatedLayout>
+          <ToastProvider>
+            <AuthenticatedLayout>
+              {children}
+            </AuthenticatedLayout>
+          </ToastProvider>
         </AuthProvider>
       </body>
     </html>
   );
 }
+

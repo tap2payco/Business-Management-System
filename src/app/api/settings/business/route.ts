@@ -46,6 +46,7 @@ export async function PUT(req: NextRequest) {
         address: data.address,
         currency: data.currency,
         taxRate: data.taxRate,
+        logo: data.logo,
       },
       create: {
         name: data.name,
@@ -54,6 +55,7 @@ export async function PUT(req: NextRequest) {
         address: data.address,
         currency: data.currency || 'TZS',
         taxRate: data.taxRate || 0,
+        logo: data.logo,
       },
     });
 

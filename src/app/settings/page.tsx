@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 
 interface BusinessSettings {
@@ -72,8 +72,22 @@ export default function SettingsPage() {
       if (!res.ok) throw new Error('Failed to upload logo');
 
       const { url } = await res.json();
+      
+      // Update local state
       setBusiness(prev => prev ? { ...prev, logo: url } : null);
-      setMessage('Logo uploaded successfully');
+      
+      // Immediately save to database
+      if (business) {
+        const saveRes = await fetch('/api/settings/business', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...business, logo: url })
+        });
+        
+        if (!saveRes.ok) throw new Error('Failed to save logo to database');
+      }
+      
+      setMessage('Logo uploaded and saved successfully');
     } catch (error) {
       setMessage('Error uploading logo');
       console.error('Logo upload error:', error);
@@ -96,7 +110,7 @@ export default function SettingsPage() {
         <div className="bg-white rounded-lg shadow p-6 space-y-4">
           {/* Logo Section */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="logo-upload" className="block text-sm font-medium text-gray-700 mb-2">
               Business Logo
             </label>
             <div className="flex items-center space-x-4">
@@ -106,11 +120,13 @@ export default function SettingsPage() {
                     src={business.logo}
                     alt="Business logo"
                     fill
+                    sizes="128px"
                     className="object-contain rounded"
                   />
                 </div>
               )}
               <input
+                id="logo-upload"
                 type="file"
                 accept="image/*"
                 onChange={handleLogoUpload}
@@ -119,13 +135,14 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          {/* Business Details */}
+            {/* Business Details */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="businessName" className="block text-sm font-medium text-gray-700 mb-1">
                 Business Name
               </label>
               <input
+                id="businessName"
                 type="text"
                 value={business.name}
                 onChange={e => setBusiness({ ...business, name: e.target.value })}
@@ -135,10 +152,11 @@ export default function SettingsPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                 Email
               </label>
               <input
+                id="email"
                 type="email"
                 value={business.email || ''}
                 onChange={e => setBusiness({ ...business, email: e.target.value })}
@@ -147,10 +165,11 @@ export default function SettingsPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
                 Phone
               </label>
               <input
+                id="phone"
                 type="tel"
                 value={business.phone || ''}
                 onChange={e => setBusiness({ ...business, phone: e.target.value })}
@@ -159,10 +178,11 @@ export default function SettingsPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
                 Address
               </label>
               <textarea
+                id="address"
                 value={business.address || ''}
                 onChange={e => setBusiness({ ...business, address: e.target.value })}
                 className="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500"
@@ -171,10 +191,11 @@ export default function SettingsPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="currency" className="block text-sm font-medium text-gray-700 mb-1">
                 Currency
               </label>
               <select
+                id="currency"
                 value={business.currency}
                 onChange={e => setBusiness({ ...business, currency: e.target.value })}
                 className="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500"
@@ -187,10 +208,11 @@ export default function SettingsPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="taxRate" className="block text-sm font-medium text-gray-700 mb-1">
                 Default Tax Rate (%)
               </label>
               <input
+                id="taxRate"
                 type="number"
                 value={business.taxRate * 100}
                 onChange={e => setBusiness({ ...business, taxRate: Number(e.target.value) / 100 })}

@@ -190,6 +190,21 @@ export async function GET() {
       take: 5
     });
 
+    // Get top selling items
+    const topSellingItems = await prisma.invoiceItem.groupBy({
+      by: ['description'],
+      _sum: {
+        quantity: true,
+        lineTotal: true
+      },
+      orderBy: {
+        _sum: {
+          lineTotal: 'desc'
+        }
+      },
+      take: 5
+    });
+
     return NextResponse.json({
       totalReceivable: Number(totalReceivable._sum.balanceDue || 0),
       totalRevenue: Number(totalRevenue._sum.grandTotal || 0),
@@ -200,6 +215,11 @@ export async function GET() {
       topExpenses: topExpenses.map((exp: any) => ({
         category: exp.category,
         amount: Number(exp._sum.amount)
+      })),
+      topSellingItems: topSellingItems.map((item: any) => ({
+        name: item.description,
+        quantity: Number(item._sum.quantity),
+        amount: Number(item._sum.lineTotal)
       }))
     });
   } catch (error) {

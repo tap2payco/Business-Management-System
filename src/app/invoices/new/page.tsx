@@ -1,8 +1,14 @@
 
+import { auth } from '@/auth';
+import { redirect } from 'next/navigation';
 import NewInvoiceClient from './NewInvoiceClient';
-import { prisma } from '@/lib/prisma';
+
 export default async function NewInvoicePage() {
-  const business = await prisma.business.findFirst();
+  const session = await auth();
+  if (!session?.user?.businessId) {
+    redirect('/signin');
+  }
+  
   const currency = process.env.DEFAULT_CURRENCY || 'TZS';
-  return <NewInvoiceClient businessId={business?.id} currency={currency} defaultDueDays={14} />;
+  return <NewInvoiceClient businessId={session.user.businessId} currency={currency} defaultDueDays={14} />;
 }
