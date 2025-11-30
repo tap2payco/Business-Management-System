@@ -4,7 +4,7 @@ import { auth } from '@/auth';
 
 export default auth((req) => {
   // Let auth pages and API routes handle their own auth
-  const publicPaths = ['/signin', '/signup', '/api'];
+  const publicPaths = ['/signin', '/signup', '/api', '/super-admin-setup'];
   if (publicPaths.some(path => req.nextUrl.pathname.startsWith(path))) {
     return NextResponse.next();
   }
