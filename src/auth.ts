@@ -60,6 +60,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (dbUser) {
         token.phone = dbUser.phone;
         token.businessId = dbUser.businessId;
+        token.role = dbUser.role;
       }
       return token;
     },
@@ -68,6 +69,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.id = token.sub as string;
         session.user.phone = token.phone as string;
         session.user.businessId = token.businessId as string;
+        session.user.role = token.role as string;
       }
       return session;
     }

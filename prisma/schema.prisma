@@ -8,21 +8,23 @@ datasource db {
 }
 
 model Business {
-  id         String    @id @default(cuid())
-  name       String
-  email      String?
-  phone      String?
-  address    String?
-  currency   String    @default("TZS")
-  taxRate    Decimal   @default(0)
-  logo       String?
-  invoices   Invoice[]
-  customers  Customer[]
-  expenses   Expense[]
-  items      Item[]
-  users      User[]
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  id              String    @id @default(cuid())
+  name            String
+  email           String?
+  phone           String?
+  address         String?
+  currency        String    @default("TZS")
+  taxRate         Decimal   @default(0)
+  logo            String?
+  invoiceTemplate String    @default("modern")
+  receiptTemplate String    @default("receipt")
+  invoices        Invoice[]
+  customers       Customer[]
+  expenses        Expense[]
+  items           Item[]
+  users           User[]
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 }
 
 model Customer {
@@ -138,6 +140,8 @@ model User {
   email         String?   @unique
   phone         String    @unique
   password      String
+  role          String    @default("owner")
+  isSuperAdmin  Boolean   @default(false)
   emailVerified DateTime?
   image         String?
   business      Business  @relation(fields: [businessId], references: [id])

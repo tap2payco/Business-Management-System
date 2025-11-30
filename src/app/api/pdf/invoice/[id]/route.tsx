@@ -83,9 +83,13 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       notes: inv.notes || undefined
     };
 
-    // Select template (default to modern)
-    const { searchParams } = new URL(req.url);
-    const templateName = searchParams.get('template') === 'classic' ? 'invoice' : 'invoice-modern';
+    // Use business template preference
+    const templateMap: Record<string, string> = {
+      'modern': 'invoice-modern',
+      'classic': 'invoice',
+      'minimal': 'invoice-minimal'
+    };
+    const templateName = templateMap[inv.business.invoiceTemplate] || 'invoice-modern';
 
     // Try Puppeteer/HTML template first
     try {
