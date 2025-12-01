@@ -83,13 +83,22 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       notes: inv.notes || undefined
     };
 
-    // Use business template preference
+    // Use business template preference or query override
     const templateMap: Record<string, string> = {
       'modern': 'invoice-modern',
       'classic': 'invoice',
       'minimal': 'invoice-minimal'
     };
-    const templateName = templateMap[inv.business.invoiceTemplate] || 'invoice-modern';
+    
+    // Check query param
+    const { searchParams } = new URL(req.url);
+    const queryTemplate = searchParams.get('template');
+    
+    const templateKey = (queryTemplate && templateMap[queryTemplate]) 
+      ? queryTemplate 
+      : inv.business.invoiceTemplate;
+      
+    const templateName = templateMap[templateKey] || 'invoice-modern';
 
     // Try Puppeteer/HTML template first
     try {

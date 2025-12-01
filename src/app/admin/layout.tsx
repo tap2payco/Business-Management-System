@@ -26,42 +26,32 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 flex">
-      {/* Admin Sidebar */}
-      <aside className="w-64 bg-slate-900 text-white flex-shrink-0">
-        <div className="p-6">
-          <h1 className="text-xl font-bold text-red-400">Super Admin</h1>
-          <p className="text-xs text-gray-400 mt-1">System Management</p>
-        </div>
-        <nav className="mt-6">
-          <Link
-            href="/admin"
-            className="block px-6 py-3 text-gray-300 hover:bg-slate-800 hover:text-white"
-          >
-            Dashboard
-          </Link>
-          <Link
-            href="/admin/businesses"
-            className="block px-6 py-3 text-gray-300 hover:bg-slate-800 hover:text-white"
-          >
-            Businesses
-          </Link>
-          <div className="mt-8 px-6">
-            <div className="border-t border-slate-700 pt-4">
-              <Link
-                href="/dashboard"
-                className="block py-2 text-sm text-blue-400 hover:text-blue-300"
-              >
-                ← Back to App
-              </Link>
-            </div>
+    <div className="min-h-screen bg-gray-100 flex flex-col">
+      {/* Admin Header */}
+      <header className="bg-slate-900 text-white shadow-md">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <h1 className="text-xl font-bold text-red-400">Super Admin Dashboard</h1>
+            <span className="px-2 py-1 rounded text-xs bg-slate-800 text-gray-400 border border-slate-700">
+              System Management
+            </span>
           </div>
-        </nav>
-      </aside>
+          <nav>
+            <Link
+              href="/dashboard"
+              className="text-sm text-blue-400 hover:text-blue-300 transition-colors flex items-center gap-2"
+            >
+              <span>←</span> Back to App
+            </Link>
+          </nav>
+        </div>
+      </header>
 
       {/* Main Content */}
-      <main className="flex-1 p-8 overflow-auto">
-        {children}
+      <main className="flex-1 overflow-auto">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {children}
+        </div>
       </main>
     </div>
   );

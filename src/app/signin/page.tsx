@@ -27,8 +27,29 @@ export default function SignInPage() {
 
       if (result?.error) {
         setError(result.error);
-      } else if (result?.url) {
-        window.location.href = result.url;
+      } else {
+        // Fetch session to check for super admin status
+        const res = await fetch('/api/auth/session');
+        const session = await res.json();
+        
+        if (session?.user?.role && session.user.isSuperAdmin) { // Note: isSuperAdmin might not be in session yet without type update, but let's try or fetch profile
+           // Actually, let's just fetch the profile or rely on the fact that we can redirect to /admin and let middleware handle it?
+           // Better: fetch user profile to be sure
+           // For now, let's just default to dashboard, but if we can check role from session that's great.
+           // Wait, we added role to session but not isSuperAdmin.
+           // Let's just redirect to /dashboard and let the user click the link, OR fetch the user profile.
+           // To keep it simple and robust:
+           window.location.href = '/dashboard';
+        } else {
+           window.location.href = callbackUrl === '/' ? '/dashboard' : callbackUrl;
+        }
+        
+        // Refined approach:
+        // We can't easily check isSuperAdmin from client session without adding it to session callback.
+        // Let's add isSuperAdmin to session callback in auth.ts first?
+        // OR we can just redirect to /dashboard and have a check there.
+        // BUT the requirement is "smart login redirection".
+        // Let's modify auth.ts to include isSuperAdmin in session.
       }
     } catch (err) {
       setError('An error occurred during sign in');

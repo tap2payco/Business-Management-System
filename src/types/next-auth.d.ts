@@ -10,12 +10,14 @@ declare module "next-auth" {
     password: string;
     businessId: string;
     role: string;
+    isSuperAdmin: boolean;
   }
   
   interface Session {
     user: User & {
       id: string;
       role: string;
+      isSuperAdmin: boolean;
     };
   }
 }
@@ -25,5 +27,6 @@ declare module "next-auth/jwt" {
     phone: string;
     businessId: string;
     role: string;
+    isSuperAdmin: boolean;
   }
 }

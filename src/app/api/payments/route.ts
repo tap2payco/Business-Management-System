@@ -23,6 +23,7 @@ export async function GET() {
       include: {
         invoice: {
           select: {
+            id: true,
             number: true,
             customer: {
               select: {

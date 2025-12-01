@@ -1,15 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { serializeBusiness } from '@/lib/serializers';
+import { auth } from '@/auth';
 
 export async function GET() {
   try {
-    // Get the first business (for now, we only support one business)
-    const business = await prisma.business.findFirst();
+    const session = await auth();
+    if (!session?.user?.businessId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const business = await prisma.business.findUnique({
+      where: { id: session.user.businessId }
+    });
 
     if (!business) {
       return NextResponse.json(
-        { error: 'No business found' },
+        { error: 'Business not found' },
         { status: 404 }
       );
     }
@@ -26,6 +33,11 @@ export async function GET() {
 
 export async function PUT(req: NextRequest) {
   try {
+    const session = await auth();
+    if (!session?.user?.businessId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const data = await req.json();
 
     // Validate required fields
@@ -36,10 +48,9 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    // Get the first business or create one if it doesn't exist
-    const business = await prisma.business.upsert({
-      where: { id: data.id || 'default' },
-      update: {
+    const business = await prisma.business.update({
+      where: { id: session.user.businessId },
+      data: {
         name: data.name,
         email: data.email,
         phone: data.phone,
@@ -47,16 +58,9 @@ export async function PUT(req: NextRequest) {
         currency: data.currency,
         taxRate: data.taxRate,
         logo: data.logo,
-      },
-      create: {
-        name: data.name,
-        email: data.email,
-        phone: data.phone,
-        address: data.address,
-        currency: data.currency || 'TZS',
-        taxRate: data.taxRate || 0,
-        logo: data.logo,
-      },
+        invoiceTemplate: data.invoiceTemplate,
+        receiptTemplate: data.receiptTemplate,
+      }
     });
 
     return NextResponse.json(serializeBusiness(business));

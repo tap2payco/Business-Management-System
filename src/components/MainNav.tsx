@@ -11,7 +11,9 @@ import {
   Wallet,
   BadgeDollarSign,
   Settings,
+  Shield,
 } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 
 interface SidebarLink {
   href: string;
@@ -73,6 +75,8 @@ const navItems: SidebarLink[] = [
 
 export function MainNav() {
   const pathname = usePathname();
+  const { data: session } = useSession();
+  const isSuperAdmin = session?.user?.isSuperAdmin;
 
   return (
     <nav className="flex h-screen w-64 flex-col border-r bg-white">
@@ -82,6 +86,20 @@ export function MainNav() {
         </Link>
       </div>
       <div className="flex-1 space-y-1 p-4">
+        {isSuperAdmin && (
+          <Link
+            href="/admin"
+            className="group flex items-center space-x-3 rounded-lg px-3 py-2 text-sm transition-colors bg-red-50 text-red-900 hover:bg-red-100 mb-4 border border-red-200"
+          >
+            <Shield className="h-5 w-5 text-red-600" />
+            <div className="flex flex-col">
+              <span className="font-medium">Admin Dashboard</span>
+              <span className="text-xs text-red-500 group-hover:text-red-700">
+                Manage System
+              </span>
+            </div>
+          </Link>
+        )}
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;

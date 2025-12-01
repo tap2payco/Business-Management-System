@@ -61,6 +61,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.phone = dbUser.phone;
         token.businessId = dbUser.businessId;
         token.role = dbUser.role;
+        token.isSuperAdmin = dbUser.isSuperAdmin;
       }
       return token;
     },
@@ -70,6 +71,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.phone = token.phone as string;
         session.user.businessId = token.businessId as string;
         session.user.role = token.role as string;
+        session.user.isSuperAdmin = token.isSuperAdmin as boolean;
       }
       return session;
     }

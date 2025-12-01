@@ -9,6 +9,7 @@ interface Payment {
   method: string;
   reference: string | null;
   invoice: {
+    id: string;
     number: string;
     customer: {
       name: string;
@@ -122,9 +123,9 @@ export default function PaymentsPage() {
                     </div>
                   </td>
                   <td className="whitespace-nowrap px-6 py-4 text-right text-sm">
-                    <button className="text-indigo-600 hover:text-indigo-900">
+                    <a href={`/invoices/${payment.invoice.id}`} className="text-indigo-600 hover:text-indigo-900">
                       View
-                    </button>
+                    </a>
                   </td>
                 </tr>
               ))}
