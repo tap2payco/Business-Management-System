@@ -1,18 +1,11 @@
-
 import NextAuth from 'next-auth';
 import { prisma } from '@/lib/prisma';
 import Credentials from 'next-auth/providers/credentials';
 import { compare } from 'bcrypt';
-import type { User } from '@prisma/client';
-import type { NextAuthConfig } from 'next-auth';
+import { authConfig } from './auth.config';
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  session: { strategy: 'jwt' },
-  pages: {
-    signIn: '/signin',
-  },
-  trustHost: true,
-  secret: process.env.AUTH_SECRET,
+  ...authConfig,
   providers: [
     Credentials({
       name: 'credentials',
@@ -49,6 +42,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
+    ...authConfig.callbacks,
     async jwt({ token, user }) {
       // Always fetch user from DB to ensure businessId is present
       let dbUser = null;
@@ -76,4 +70,4 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return session;
     }
   }
-} satisfies NextAuthConfig);
+});
