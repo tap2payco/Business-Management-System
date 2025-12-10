@@ -8,113 +8,112 @@ datasource db {
 }
 
 model Business {
-  id              String    @id @default(cuid())
+  id              String     @id @default(cuid())
   name            String
   email           String?
   phone           String?
   address         String?
-  currency        String    @default("TZS")
-  taxRate         Decimal   @default(0)
+  currency        String     @default("TZS")
+  taxRate         Decimal    @default(0)
   logo            String?
-  invoiceTemplate String    @default("modern")
-  receiptTemplate String    @default("receipt")
-  invoices        Invoice[]
+  invoiceTemplate String     @default("modern")
+  receiptTemplate String     @default("receipt")
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
   customers       Customer[]
   expenses        Expense[]
+  invoices        Invoice[]
   items           Item[]
   users           User[]
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
 }
 
 model Customer {
   id         String    @id @default(cuid())
-  business   Business  @relation(fields: [businessId], references: [id])
   businessId String
   name       String
   email      String?
   phone      String?
   address    String?
-  invoices   Invoice[]
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
+  business   Business  @relation(fields: [businessId], references: [id])
+  invoices   Invoice[]
 }
 
 model Invoice {
-  id           String        @id @default(cuid())
-  business     Business      @relation(fields: [businessId], references: [id])
-  businessId   String
-  customer     Customer      @relation(fields: [customerId], references: [id])
-  customerId   String
-  number       String        @unique
-  issueDate    DateTime
-  dueDate      DateTime
-  currency     String
-  status       String        @default("DRAFT")
-  notes        String?
-  subtotal     Decimal       @default(0)
-  taxTotal     Decimal       @default(0)
-  grandTotal   Decimal       @default(0)
-  amountPaid   Decimal       @default(0)
-  balanceDue   Decimal       @default(0)
-  items        InvoiceItem[]
-  payments     Payment[]
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  id         String        @id @default(cuid())
+  businessId String
+  customerId String
+  number     String        @unique
+  issueDate  DateTime
+  dueDate    DateTime
+  currency   String
+  status     String        @default("DRAFT")
+  notes      String?
+  subtotal   Decimal       @default(0)
+  taxTotal   Decimal       @default(0)
+  grandTotal Decimal       @default(0)
+  amountPaid Decimal       @default(0)
+  balanceDue Decimal       @default(0)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  business   Business      @relation(fields: [businessId], references: [id])
+  customer   Customer      @relation(fields: [customerId], references: [id])
+  items      InvoiceItem[]
+  payments   Payment[]
 }
 
 model InvoiceItem {
-  id          String    @id @default(cuid())
-  invoice     Invoice   @relation(fields: [invoiceId], references: [id])
+  id          String   @id @default(cuid())
   invoiceId   String
   description String
   quantity    Decimal
   unitPrice   Decimal
   taxRate     Decimal
   lineTotal   Decimal
-  item        Item?     @relation(fields: [itemId], references: [id])
   itemId      String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id])
+  item        Item?    @relation(fields: [itemId], references: [id])
 }
 
 model Item {
-  id            String        @id @default(cuid())
-  business      Business      @relation(fields: [businessId], references: [id])
-  businessId    String
-  name          String
-  description   String?
-  unitPrice     Decimal
-  taxRate       Decimal       @default(0)
-  invoiceItems  InvoiceItem[]
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  id           String        @id @default(cuid())
+  businessId   String
+  name         String
+  description  String?
+  unitPrice    Decimal
+  taxRate      Decimal       @default(0)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  invoiceItems InvoiceItem[]
+  business     Business      @relation(fields: [businessId], references: [id])
 }
 
 model Payment {
-  id         String   @id @default(cuid())
-  invoice    Invoice  @relation(fields: [invoiceId], references: [id])
-  invoiceId  String
-  amount     Decimal
-  method     String
-  reference  String?
-  paidAt     DateTime
-  receipt    Receipt?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id        String   @id @default(cuid())
+  invoiceId String
+  amount    Decimal
+  method    String
+  reference String?
+  paidAt    DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  invoice   Invoice  @relation(fields: [invoiceId], references: [id])
+  receipt   Receipt?
 }
 
 model Receipt {
   id        String   @id @default(cuid())
   number    String   @unique
-  payment   Payment  @relation(fields: [paymentId], references: [id])
   paymentId String   @unique
   issuedAt  DateTime @default(now())
+  payment   Payment  @relation(fields: [paymentId], references: [id])
 }
 
 model Expense {
   id          String   @id @default(cuid())
-  business    Business @relation(fields: [businessId], references: [id])
   businessId  String
   date        DateTime
   amount      Decimal
@@ -124,13 +123,15 @@ model Expense {
   notes       String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  business    Business @relation(fields: [businessId], references: [id])
 }
 
 model Sequence {
-  id     String @id @default(cuid())
-  kind   String
-  year   Int
-  next   Int
+  id   String @id @default(cuid())
+  kind String
+  year Int
+  next Int
+
   @@unique([kind, year])
 }
 
@@ -144,30 +145,30 @@ model User {
   isSuperAdmin  Boolean   @default(false)
   emailVerified DateTime?
   image         String?
-  business      Business  @relation(fields: [businessId], references: [id])
   businessId    String
-  accounts      Account[]
-  sessions      Session[]
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+  accounts      Account[]
+  sessions      Session[]
+  business      Business  @relation(fields: [businessId], references: [id])
 }
 
 model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String?
-  access_token      String?
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String?
-  session_state     String?
-  oauth_token       String?
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?
+  access_token       String?
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?
+  session_state      String?
+  oauth_token        String?
   oauth_token_secret String?
-  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user               User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
