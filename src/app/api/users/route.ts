@@ -4,6 +4,8 @@ import { prisma } from '@/lib/prisma';
 import { canManageUsers } from '@/lib/permissions';
 import { hash } from 'bcrypt';
 
+export const dynamic = 'force-dynamic';
+
 // GET /api/users - List all users in the business
 export async function GET(req: NextRequest) {
   try {

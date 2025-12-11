@@ -4,6 +4,8 @@ import { auth } from '@/auth';
 import { z } from 'zod';
 import { serializeExpense } from '@/lib/serializers';
 
+export const dynamic = 'force-dynamic';
+
 const expenseSchema = z.object({
   date: z.string().or(z.date()),
   amount: z.number().positive(),
