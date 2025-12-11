@@ -3,6 +3,8 @@ import { prisma } from '@/lib/prisma';
 import { auth } from '@/auth';
 import { z } from 'zod';
 
+export const dynamic = 'force-dynamic';
+
 const customerSchema = z.object({
   name: z.string().min(1),
   email: z.string().email().optional().nullable(),

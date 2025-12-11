@@ -3,15 +3,27 @@ import { prisma } from '@/lib/prisma';
 import fs from 'fs';
 import path from 'path';
 import { renderPdfFromTemplate } from '@/lib/pdf-puppeteer';
+import { auth } from '@/auth';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const session = await auth();
+    if (!session?.user?.businessId) {
+      return new Response('Unauthorized', { status: 401 });
+    }
+
     const { id } = await params;
     const inv = await prisma.invoice.findUnique({
       where: { id },
       include: { items: true, customer: true, business: true, payments: true }
     });
+
     if (!inv) return new Response('Not found', { status: 404 });
+
+    // Security check: Ensure invoice belongs to user's business
+    if (inv.businessId !== session.user.businessId && !session.user.isSuperAdmin) {
+      return new Response('Forbidden', { status: 403 });
+    }
 
     // Prepare logo as data URL (same logic as before)
     let logoDataUrl: string | undefined;
@@ -114,9 +126,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
         }
       });
     } catch (e) {
-      console.error('Puppeteer PDF render error', e);
+      console.error('Puppeteer PDF render error:', e);
       // Fallback: old child process or react-pdf
-      return new Response('PDF generation failed', { status: 500 });
+      return new Response(`PDF generation failed: ${e instanceof Error ? e.message : String(e)}`, { status: 500 });
     }
   } catch (error) {
     console.error('PDF Generation Error:', error);

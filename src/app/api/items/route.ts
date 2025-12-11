@@ -4,6 +4,8 @@ import { auth } from '@/auth';
 import { z } from 'zod';
 import { serializeItem } from '@/lib/serializers';
 
+export const dynamic = 'force-dynamic';
+
 const itemSchema = z.object({
   name: z.string().min(1),
   description: z.string().optional(),
