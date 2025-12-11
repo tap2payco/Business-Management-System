@@ -9,10 +9,38 @@ export async function renderPdfFromTemplate(templateName: string, data: any): Pr
   const template = Handlebars.compile(htmlSrc);
   const html = template(data);
 
-  const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
-  const page = await browser.newPage();
-  await page.setContent(html, { waitUntil: 'networkidle0' });
-  const pdfBuffer = await page.pdf({ format: 'A4', printBackground: true });
-  await browser.close();
-  return new Uint8Array(pdfBuffer);
+  let browser;
+
+  if (process.env.NODE_ENV === 'production') {
+    // Production: Use sparticuz/chromium
+    const chromium = require('@sparticuz/chromium');
+    const puppeteerCore = require('puppeteer-core');
+
+    // Optional: Load custom font if needed
+    // await chromium.font('https://raw.githack.com/googlei18n/noto-emoji/master/fonts/NotoColorEmoji.ttf');
+
+    browser = await puppeteerCore.launch({
+      args: chromium.args,
+      defaultViewport: chromium.defaultViewport,
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless,
+      ignoreHTTPSErrors: true,
+    });
+  } else {
+    // Development: Use local puppeteer
+    browser = await puppeteer.launch({ 
+      args: ['--no-sandbox', '--disable-setuid-sandbox'] 
+    });
+  }
+
+  try {
+    const page = await browser.newPage();
+    await page.setContent(html, { waitUntil: 'networkidle0' });
+    const pdfBuffer = await page.pdf({ format: 'A4', printBackground: true });
+    return new Uint8Array(pdfBuffer);
+  } finally {
+    if (browser) {
+      await browser.close();
+    }
+  }
 }
