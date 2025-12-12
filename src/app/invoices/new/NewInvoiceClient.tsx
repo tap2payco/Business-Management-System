@@ -8,6 +8,7 @@ interface Item {
   description: string | null;
   unitPrice: number;
   taxRate: number;
+  unit?: string;
 }
 
 interface Customer {
@@ -20,7 +21,7 @@ interface Customer {
 
 export default function NewInvoiceClient({ businessId, currency, defaultDueDays }: { businessId?: string; currency: string; defaultDueDays: number; }) {
   const [customer, setCustomer] = useState({ name: '', email: '', phone: '', address: '' });
-  const [items, setItems] = useState([{ itemId: undefined as string | undefined, description: '', quantity: 1, unitPrice: 0, taxRate: undefined as number | undefined }]);
+  const [items, setItems] = useState([{ itemId: undefined as string | undefined, description: '', quantity: 1, unitPrice: 0, taxRate: undefined as number | undefined, unit: 'pcs' }]);
   const [availableItems, setAvailableItems] = useState<Item[]>([]);
   const [availableCustomers, setAvailableCustomers] = useState<Customer[]>([]);
   const [filteredCustomers, setFilteredCustomers] = useState<Customer[]>([]);
@@ -94,7 +95,8 @@ export default function NewInvoiceClient({ businessId, currency, defaultDueDays 
         itemId: item.id,
         description: item.name + (item.description ? ` - ${item.description}` : ''),
         unitPrice: item.unitPrice,
-        taxRate: item.taxRate
+        taxRate: item.taxRate,
+        unit: item.unit || 'pcs'
       };
     }));
     setActiveItemIndex(null);
@@ -114,7 +116,8 @@ export default function NewInvoiceClient({ businessId, currency, defaultDueDays 
             itemId: value,
             description: selectedItem.name + (selectedItem.description ? ` - ${selectedItem.description}` : ''),
             unitPrice: selectedItem.unitPrice,
-            taxRate: selectedItem.taxRate
+            taxRate: selectedItem.taxRate,
+            unit: selectedItem.unit || 'pcs'
           };
         }
       }
@@ -171,7 +174,7 @@ export default function NewInvoiceClient({ businessId, currency, defaultDueDays 
           setCustomer(draft.customer);
         }
       }
-      if (draft.items?.length > 0) setItems(draft.items);
+      if (draft.items?.length > 0) setItems(draft.items.map((i: any) => ({ ...i, unit: i.unit || 'pcs' })));
       if (draft.notes) setNotes(draft.notes);
       if (draft.dueInDays) setDueInDays(draft.dueInDays);
       
@@ -185,7 +188,7 @@ export default function NewInvoiceClient({ businessId, currency, defaultDueDays 
     setSaving(true);
     const now = new Date();
     const due = new Date(now.getTime() + (dueInDays ?? 14) * 864e5);
-    const payload = { businessId, customer, items: items.map(i => ({ ...i, quantity: Number(i.quantity), unitPrice: Number(i.unitPrice) })), issueDate: now.toISOString(), dueDate: due.toISOString(), currency, notes };
+    const payload = { businessId, customer, items: items.map(i => ({ ...i, quantity: Number(i.quantity), unitPrice: Number(i.unitPrice), unit: i.unit })), issueDate: now.toISOString(), dueDate: due.toISOString(), currency, notes };
     const res = await fetch('/api/invoices', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
     
     if (!res.ok) {
@@ -297,6 +300,9 @@ export default function NewInvoiceClient({ businessId, currency, defaultDueDays 
             <div className="sm:col-span-4">
               <input aria-label="Item Description" className="border p-2 rounded w-full" placeholder="Description" value={it.description} onChange={e=>setItem(i,'description', e.target.value)} />
             </div>
+            <div className="sm:col-span-1">
+              <input aria-label="Item Unit" className="border p-2 rounded w-full" placeholder="Unit" value={it.unit || ''} onChange={e=>setItem(i, 'unit', e.target.value)} />
+            </div>
             <div className="sm:col-span-2">
               <input aria-label="Item Quantity" className="border p-2 rounded w-full" placeholder="Qty" type="number" value={it.quantity} onChange={e=>setItem(i,'quantity', Number(e.target.value))} />
             </div>
@@ -308,7 +314,7 @@ export default function NewInvoiceClient({ businessId, currency, defaultDueDays 
             </div>
           </div>
         ))}
-        <button onClick={()=>setItems([...items, { itemId: undefined, description:'', quantity:1, unitPrice:0, taxRate: undefined }])} className="px-3 py-1 border rounded">+ Add Item</button>
+        <button onClick={()=>setItems([...items, { itemId: undefined, description:'', quantity:1, unitPrice:0, taxRate: undefined, unit: 'pcs' }])} className="px-3 py-1 border rounded">+ Add Item</button>
       </div>
 
       <div className="bg-white p-4 rounded shadow space-y-2">

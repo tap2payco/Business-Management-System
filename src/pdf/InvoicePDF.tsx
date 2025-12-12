@@ -20,6 +20,7 @@ interface InvoiceProps {
     items: Array<{
       description: string;
       quantity: number;
+      unit?: string;
       unitPrice: number;
       taxRate?: number;
       lineTotal: number;
@@ -235,7 +236,7 @@ export function InvoicePDF({ invoice }: InvoiceProps) {
           {invoice.items.map((it, i) => (
             <View style={styles.tableRow} key={i}>
               <Text style={styles.colDesc}>{it.description}</Text>
-              <Text style={styles.colQty}>{Number(it.quantity).toFixed(2)}</Text>
+              <Text style={styles.colQty}>{Number(it.quantity).toFixed(2)} {it.unit || ''}</Text>
               <Text style={styles.colUnit}>{Number(it.unitPrice).toFixed(2)}</Text>
               <Text style={styles.colTotal}>{fmt(it.lineTotal)}</Text>
             </View>

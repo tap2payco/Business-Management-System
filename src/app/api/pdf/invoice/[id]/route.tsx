@@ -60,6 +60,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     const items = inv.items.map((item: any) => ({
       description: item.description,
       quantity: Number(item.quantity),
+      unit: item.unit || '',
       unitPrice: Number(item.unitPrice),
       taxRate: Number(item.taxRate || 0),
       lineTotal: Number(item.lineTotal ?? (Number(item.quantity) * Number(item.unitPrice)))

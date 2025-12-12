@@ -43,7 +43,7 @@ export default function InvoiceClientView({ inv }: { inv: any }) {
           {inv.items.map((it: any) => (
             <li key={it.id} className="flex justify-between">
               <span>{it.description}</span>
-              <span>{Number(it.quantity)} x {Number(it.unitPrice)} = {Number(it.lineTotal)}</span>
+              <span>{Number(it.quantity)} {it.unit || ''} x {Number(it.unitPrice)} = {Number(it.lineTotal)}</span>
             </li>
           ))}
         </ul>

@@ -2,7 +2,7 @@
 import { useState } from 'react';
 
 export default function NewItemPage() {
-  const [form, setForm] = useState({ name: '', description: '', unitPrice: '', taxRate: '' });
+  const [form, setForm] = useState({ name: '', description: '', unitPrice: '', taxRate: '', unit: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -32,7 +32,8 @@ export default function NewItemPage() {
           name: form.name.trim(),
           description: form.description || null,
           unitPrice: unitPriceNum,
-          taxRate: taxRateNum
+          taxRate: taxRateNum,
+          unit: form.unit || undefined
         })
       });
 

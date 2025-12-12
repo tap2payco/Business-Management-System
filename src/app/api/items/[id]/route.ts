@@ -8,7 +8,8 @@ const itemSchema = z.object({
   name: z.string().min(1),
   description: z.string().optional(),
   unitPrice: z.number().positive(),
-  taxRate: z.number().min(0).max(1)
+  taxRate: z.number().min(0).max(1),
+  unit: z.string().default('pcs'),
 });
 
 export async function GET(
