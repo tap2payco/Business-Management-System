@@ -62,6 +62,7 @@ CREATE TABLE "InvoiceItem" (
     "taxRate" DECIMAL(65,30) NOT NULL,
     "lineTotal" DECIMAL(65,30) NOT NULL,
     "itemId" TEXT,
+    "unit" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -74,6 +75,7 @@ CREATE TABLE "Item" (
     "businessId" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT,
+    "unit" TEXT NOT NULL DEFAULT 'pcs',
     "unitPrice" DECIMAL(65,30) NOT NULL,
     "taxRate" DECIMAL(65,30) NOT NULL DEFAULT 0,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
