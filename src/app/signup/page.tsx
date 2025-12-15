@@ -40,22 +40,16 @@ export default function SignUpPage() {
       }
 
       // After successful signup, sign in the user
-      const signInResult = await signIn("credentials", {
+      // redirect: true (default) handles the session cookie and navigation reliably
+      await signIn("credentials", {
         phone,
         password,
-        redirect: false,
+        callbackUrl: "/",
       });
-
-      if (signInResult?.error) {
-        throw new Error(signInResult.error);
-      }
-
-      router.push("/");
-      router.refresh(); // Soft refresh to update server components with new session
+      // The code below this await won't execute because of the redirect
     } catch (error) {
       setError(error instanceof Error ? error.message : "Something went wrong");
-    } finally {
-      setLoading(false);
+      setLoading(false); // Only stop loading on error since success redirects
     }
   };
 
