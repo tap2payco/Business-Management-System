@@ -16,15 +16,68 @@ export async function POST(req: NextRequest) {
     const grandTotal = subtotal + taxTotal;
     const number = await getNextNumber('invoice');
     
-    // Require businessId - don't create new businesses
-    if (!payload.businessId) {
-      throw new Error('Business ID is required');
+    // Verify authentication
+    const { auth } = await import('@/auth');
+    const session = await auth();
+    if (!session?.user?.businessId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    
+
+    const bizId = session.user.businessId;
+
     const invoice = await prisma.$transaction(async (tx) => {
-      const bizId = payload.businessId;
-      const custId = payload.customer.id ?? (await tx.customer.create({ data: { businessId: bizId, name: payload.customer.name, email: payload.customer.email, phone: payload.customer.phone, address: payload.customer.address } })).id;
-      const inv = await tx.invoice.create({ data: { businessId: bizId, customerId: custId, number, issueDate: new Date(payload.issueDate), dueDate: new Date(payload.dueDate), currency: payload.currency, notes: payload.notes, subtotal, taxTotal, grandTotal, amountPaid: 0, balanceDue: grandTotal, status: 'SENT', items: { create: items.map((it: any) => ({ itemId: it.itemId || undefined, description: it.description, quantity: it.quantity, unitPrice: it.unitPrice, taxRate: it.taxRate ?? taxDefault, lineTotal: it.quantity * it.unitPrice, unit: it.unit })) } } });
+      // For customers, we should also verify/scope them to the business
+      let custId = payload.customer.id;
+      if (!custId) {
+         // Create new customer scoped to business
+         const newCust = await tx.customer.create({ 
+            data: { 
+              businessId: bizId, 
+              name: payload.customer.name, 
+              email: payload.customer.email, 
+              phone: payload.customer.phone, 
+              address: payload.customer.address 
+            } 
+         });
+         custId = newCust.id;
+      } else {
+         // Verify customer belongs to business
+         const existingDetails = await tx.customer.findFirst({
+           where: { id: custId, businessId: bizId }
+         });
+         if (!existingDetails) {
+           throw new Error('Invalid customer for this business');
+         }
+      }
+
+      const inv = await tx.invoice.create({ 
+        data: { 
+          businessId: bizId, 
+          customerId: custId, 
+          number, 
+          issueDate: new Date(payload.issueDate), 
+          dueDate: new Date(payload.dueDate), 
+          currency: payload.currency, 
+          notes: payload.notes, 
+          subtotal, 
+          taxTotal, 
+          grandTotal, 
+          amountPaid: 0, 
+          balanceDue: grandTotal, 
+          status: 'SENT', 
+          items: { 
+            create: items.map((it: any) => ({ 
+              itemId: it.itemId || undefined, 
+              description: it.description, 
+              quantity: it.quantity, 
+              unitPrice: it.unitPrice, 
+              taxRate: it.taxRate ?? taxDefault, 
+              lineTotal: it.quantity * it.unitPrice, 
+              unit: it.unit 
+            })) 
+          } 
+        } 
+      });
       return inv;
     });
     return NextResponse.json({ id: invoice.id, number: invoice.number });

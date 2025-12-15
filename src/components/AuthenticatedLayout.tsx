@@ -54,6 +54,13 @@ export function AuthenticatedLayout({
     return null;
   }
 
+  // If we are in the admin section, we want to skip the standard app chrome (sidebar/header)
+  // because the Admin Layout will handle its own full-screen structure.
+  // We just return children (checked for auth).
+  if (pathname?.startsWith('/admin')) {
+     return <>{children}</>;
+  }
+
   return (
     <div className="flex min-h-screen">
       <MainNav isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />

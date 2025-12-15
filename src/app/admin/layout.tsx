@@ -1,58 +1,39 @@
-import React from 'react';
-import Link from 'next/link';
-import { auth } from '@/auth';
-import { redirect } from 'next/navigation';
-import { prisma } from '@/lib/prisma';
+"use client";
 
-export default async function AdminLayout({
+import { useState } from 'react';
+import { AdminSidebar } from '@/components/admin/AdminSidebar';
+import { Menu } from 'lucide-react';
+
+export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await auth();
-
-  if (!session?.user?.id) {
-    redirect('/signin');
-  }
-
-  // Verify super admin status directly from DB
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: { isSuperAdmin: true }
-  });
-
-  if (!user?.isSuperAdmin) {
-    redirect('/dashboard'); // Redirect normal users back to their dashboard
-  }
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col">
-      {/* Admin Header */}
-      <header className="bg-slate-900 text-white shadow-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <h1 className="text-xl font-bold text-red-400">Super Admin Dashboard</h1>
-            <span className="px-2 py-1 rounded text-xs bg-slate-800 text-gray-400 border border-slate-700">
-              System Management
-            </span>
-          </div>
-          <nav>
-            <Link
-              href="/dashboard"
-              className="text-sm text-blue-400 hover:text-blue-300 transition-colors flex items-center gap-2"
+    <div className="flex min-h-screen bg-slate-50">
+      <AdminSidebar isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
+      
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Mobile Header */}
+        <header className="md:hidden border-b bg-white sticky top-0 z-30">
+          <div className="flex h-16 items-center px-4">
+            <button
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="p-2 rounded-lg hover:bg-gray-100 mr-4"
+              aria-label="Open menu"
             >
-              <span>←</span> Back to App
-            </Link>
-          </nav>
-        </div>
-      </header>
+              <Menu className="h-6 w-6" />
+            </button>
+            <span className="font-semibold text-gray-900">Admin Panel</span>
+          </div>
+        </header>
 
-      {/* Main Content */}
-      <main className="flex-1 overflow-auto">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <main className="flex-1 p-4 md:p-8">
           {children}
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 }

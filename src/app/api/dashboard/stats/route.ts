@@ -4,12 +4,22 @@ import { startOfMonth, endOfMonth, subMonths } from 'date-fns';
 
 export async function GET() {
   try {
+    const { auth } = await import('@/auth');
+    const session = await auth();
+    
+    if (!session?.user?.businessId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const businessId = session.user.businessId;
+
     // Get total receivable (unpaid invoices)
     const totalReceivable = await prisma.invoice.aggregate({
       _sum: {
         balanceDue: true
       },
       where: {
+        businessId,
         status: 'PENDING'
       }
     });
@@ -20,6 +30,7 @@ export async function GET() {
         grandTotal: true
       },
       where: {
+        businessId,
         status: 'PAID'
       }
     });
@@ -28,6 +39,9 @@ export async function GET() {
     const totalExpenses = await prisma.expense.aggregate({
       _sum: {
         amount: true
+      },
+      where: {
+        businessId
       }
     });
 
@@ -37,6 +51,7 @@ export async function GET() {
     
     const activeCustomers = await prisma.customer.count({
       where: {
+        businessId,
         OR: [
           {
             invoices: {
@@ -67,6 +82,7 @@ export async function GET() {
     // Get recent transactions (invoices, payments, expenses)
     const [recentInvoices, recentPayments, recentExpenses] = await Promise.all([
       prisma.invoice.findMany({
+        where: { businessId },
         take: 5,
         orderBy: { createdAt: 'desc' },
         select: {
@@ -80,6 +96,7 @@ export async function GET() {
         }
       }),
       prisma.payment.findMany({
+        where: { invoice: { businessId } },
         take: 5,
         orderBy: { paidAt: 'desc' },
         select: {
@@ -96,8 +113,8 @@ export async function GET() {
           }
         }
       }),
-      // You'll need to create an Expense model in your schema
       prisma.expense.findMany({
+        where: { businessId },
         take: 5,
         orderBy: { date: 'desc' },
         select: {
@@ -151,6 +168,7 @@ export async function GET() {
         const sales = await prisma.invoice.aggregate({
           _sum: { grandTotal: true },
           where: {
+            businessId,
             createdAt: {
               gte: start,
               lte: end
@@ -161,6 +179,7 @@ export async function GET() {
         const expenses = await prisma.expense.aggregate({
           _sum: { amount: true },
           where: {
+            businessId,
             date: {
               gte: start,
               lte: end
@@ -179,6 +198,7 @@ export async function GET() {
     // Get top expenses by category
     const topExpenses = await prisma.expense.groupBy({
       by: ['category'],
+      where: { businessId },
       _sum: {
         amount: true
       },
@@ -193,6 +213,11 @@ export async function GET() {
     // Get top selling items
     const topSellingItems = await prisma.invoiceItem.groupBy({
       by: ['description'],
+      where: { 
+        invoice: {
+          businessId
+        }
+      },
       _sum: {
         quantity: true,
         lineTotal: true
