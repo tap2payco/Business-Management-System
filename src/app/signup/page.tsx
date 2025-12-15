@@ -50,9 +50,8 @@ export default function SignUpPage() {
         throw new Error(signInResult.error);
       }
 
-  router.push("/");
-  // Force a hard reload to ensure session is refreshed and businessId is present
-  window.location.reload();
+      router.push("/");
+      router.refresh(); // Soft refresh to update server components with new session
     } catch (error) {
       setError(error instanceof Error ? error.message : "Something went wrong");
     } finally {
