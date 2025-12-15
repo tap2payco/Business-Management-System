@@ -1,20 +1,21 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/auth';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(
-  req: Request,
-  { params }: { params: { id: string } }
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     // In a real app, verify Admin role here
     const session = await auth();
     // if (!session?.user?.email?.endsWith('@admin.com')) ... 
 
     const business = await prisma.business.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         users: {
           select: { id: true, name: true, email: true, phone: true, role: true, createdAt: true }
@@ -56,14 +57,15 @@ export async function GET(
 }
 
 export async function DELETE(
-  req: Request,
-  { params }: { params: { id: string } }
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     const session = await auth();
     // Verify admin...
 
-    const businessId = params.id;
+    const businessId = id;
 
     // Perform cascading delete manually in a transaction since schema might be RESTRICT
     await prisma.$transaction(async (tx) => {

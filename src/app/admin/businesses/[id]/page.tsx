@@ -2,17 +2,20 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 
-export default function BusinessDetailPage({ params }: { params: { id: string } }) {
+export default function BusinessDetailPage() {
+  const params = useParams<{ id: string }>();
   const [business, setBusiness] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const router = useRouter();
 
   useEffect(() => {
-    fetchBusiness();
-  }, [params.id]);
+    if (params?.id) {
+        fetchBusiness();
+    }
+  }, [params?.id]);
 
   async function fetchBusiness() {
     try {
