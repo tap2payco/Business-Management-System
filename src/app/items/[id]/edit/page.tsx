@@ -1,56 +1,61 @@
 "use client";
-
-import { useState, useEffect, use } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useToast } from '@/components/Toast';
-import { DeleteConfirmModal } from '@/components/DeleteConfirmModal';
+
+const COMMON_UNITS = [
+    'pcs', 'kg', 'g', 'm', 'cm', 'l', 'ml', 'hrs', 'days', 'service', 'box', 'pack'
+  ];
 
 interface Item {
   id: string;
   name: string;
   description: string | null;
-  unit: string | null;
   unitPrice: number;
   taxRate: number;
+  unit: string;
 }
 
-export default function EditItemPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params);
+export default function EditItemPage({ params }: { params: { id: string } }) {
   const router = useRouter();
-  const { showSuccess, showError } = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [item, setItem] = useState<Item | null>(null);
+  const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    unit: '',
-    unitPrice: 0,
-    taxRate: 0
+    unitPrice: '',
+    taxRate: '',
+    unit: 'pcs'
   });
+  const [isCustomUnit, setIsCustomUnit] = useState(false);
+  const [customUnit, setCustomUnit] = useState('');
 
   useEffect(() => {
     fetchItem();
-  }, [id]);
+  }, [params.id]);
 
   async function fetchItem() {
     try {
-      const res = await fetch(`/api/items/${id}`);
+      const res = await fetch(`/api/items/${params.id}`);
       if (!res.ok) throw new Error('Failed to fetch item');
-      const data = await res.json();
-      setItem(data);
+      const item: Item = await res.json();
+      
+      const isCommon = COMMON_UNITS.includes(item.unit || 'pcs');
       setFormData({
-        name: data.name,
-        description: data.description || '',
-        unit: data.unit || '',
-        unitPrice: data.unitPrice,
-        taxRate: data.taxRate * 100 // Convert to percentage
+        name: item.name,
+        description: item.description || '',
+        unitPrice: String(item.unitPrice),
+        taxRate: String(item.taxRate),
+        unit: item.unit || 'pcs'
       });
-    } catch (error) {
-      showError('Failed to load item');
-      console.error(error);
+      
+      if (!isCommon && item.unit) {
+          setIsCustomUnit(true);
+          setCustomUnit(item.unit);
+      }
+
+    } catch (err: any) {
+      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -59,205 +64,158 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
+    setError('');
 
     try {
-      const res = await fetch(`/api/items/${id}`, {
+        const finalUnit = isCustomUnit ? customUnit : formData.unit;
+        if (isCustomUnit && !finalUnit.trim()) {
+            throw new Error('Please specify the custom unit');
+        }
+
+      const res = await fetch(`/api/items/${params.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: formData.name,
-          description: formData.description || undefined,
-          unit: formData.unit || undefined,
-          unitPrice: formData.unitPrice,
-          taxRate: formData.taxRate / 100 // Convert back to decimal
+          description: formData.description,
+          unitPrice: Number(formData.unitPrice),
+          taxRate: Number(formData.taxRate),
+          unit: finalUnit
         })
       });
 
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.error || 'Failed to update item');
-      }
-
-      showSuccess('Item updated successfully');
+      if (!res.ok) throw new Error('Failed to update item');
       router.push('/items');
-    } catch (error: any) {
-      showError(error.message || 'Failed to update item');
-      console.error(error);
+      router.refresh();
+    } catch (err: any) {
+      setError(err.message);
     } finally {
       setSaving(false);
     }
   }
 
   async function handleDelete() {
-    setDeleting(true);
-
+    if (!confirm('Are you sure you want to delete this item?')) return;
+    
     try {
-      const res = await fetch(`/api/items/${id}`, {
-        method: 'DELETE'
-      });
-
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.error || 'Failed to delete item');
-      }
-
-      showSuccess('Item deleted successfully');
+      const res = await fetch(`/api/items/${params.id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Failed to delete item');
       router.push('/items');
-    } catch (error: any) {
-      showError(error.message || 'Failed to delete item');
-      console.error(error);
-      setDeleting(false);
-      setShowDeleteModal(false);
+      router.refresh();
+    } catch (err: any) {
+      alert(err.message);
     }
   }
 
-  if (loading) {
-    return (
-      <div className="flex h-[calc(100vh-4rem)] items-center justify-center">
-        <div className="text-center">
-          <div className="h-32 w-32 animate-spin rounded-full border-b-2 border-gray-900"></div>
-          <p className="mt-4 text-gray-600">Loading item...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!item) {
-    return (
-      <div className="flex h-[calc(100vh-4rem)] items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-600">Item not found</p>
-          <button
-            onClick={() => router.push('/items')}
-            className="mt-4 rounded-lg bg-gray-900 px-4 py-2 text-white hover:bg-gray-800"
-          >
-            Back to Items
-          </button>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div className="text-red-500">{error}</div>;
 
   return (
-    <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Edit Item</h1>
-          <p className="mt-2 text-gray-600">Update item information</p>
-        </div>
-        <button
-          onClick={() => router.push('/items')}
-          className="rounded-lg border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-50"
+    <div className="max-w-lg mx-auto mt-10 bg-white p-8 rounded shadow">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Edit Item</h1>
+        <button 
+          onClick={handleDelete}
+          className="text-red-600 text-sm hover:underline"
+          type="button"
         >
-          Cancel
+          Delete Item
         </button>
       </div>
 
-      <div className="rounded-lg border bg-white p-6">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-              Item Name *
-            </label>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Item Name</label>
             <input
-              type="text"
-              id="name"
-              required
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+            className="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500"
+            value={formData.name}
+            onChange={e => setFormData({...formData, name: e.target.value})}
+            required
             />
-          </div>
+        </div>
 
-          <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-              Description
-            </label>
-            <textarea
-              id="description"
-              rows={3}
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+        <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <input
+            className="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500"
+            value={formData.description}
+            onChange={e => setFormData({...formData, description: e.target.value})}
             />
-          </div>
+        </div>
 
-          <div>
-             <label htmlFor="unit" className="block text-sm font-medium text-gray-700">
-               Unit (e.g. pcs, kg)
-             </label>
-             <input
-               type="text"
-               id="unit"
-               value={formData.unit}
-               onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
-               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
-             />
-           </div>
-
-          <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="unitPrice" className="block text-sm font-medium text-gray-700">
-                Unit Price (TZS) *
-              </label>
-              <input
+                <label className="block text-sm font-medium text-gray-700 mb-1">Unit Price</label>
+                <input
+                className="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500"
                 type="number"
-                id="unitPrice"
-                required
-                min="0"
-                step="0.01"
                 value={formData.unitPrice}
-                onChange={(e) => setFormData({ ...formData, unitPrice: parseFloat(e.target.value) })}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="taxRate" className="block text-sm font-medium text-gray-700">
-                Tax Rate (%) *
-              </label>
-              <input
-                type="number"
-                id="taxRate"
+                onChange={e => setFormData({...formData, unitPrice: e.target.value})}
                 required
-                min="0"
-                max="100"
-                step="0.1"
-                value={formData.taxRate}
-                onChange={(e) => setFormData({ ...formData, taxRate: parseFloat(e.target.value) })}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
-              />
+                />
             </div>
-          </div>
+             <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Tax Rate</label>
+                <input
+                className="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500"
+                type="number"
+                step="0.01"
+                value={formData.taxRate}
+                onChange={e => setFormData({...formData, taxRate: e.target.value})}
+                />
+            </div>
+        </div>
 
-          <div className="flex justify-between border-t pt-6">
-            <button
-              type="button"
-              onClick={() => setShowDeleteModal(true)}
-              className="rounded-lg bg-red-600 px-4 py-2 text-white hover:bg-red-700"
-            >
-              Delete Item
-            </button>
-            <button
-              type="submit"
-              disabled={saving}
-              className="rounded-lg bg-gray-900 px-4 py-2 text-white hover:bg-gray-800 disabled:opacity-50"
-            >
-              {saving ? 'Saving...' : 'Save Changes'}
-            </button>
-          </div>
-        </form>
-      </div>
+        <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Unit of Measurement</label>
+            <div className="flex gap-2">
+                <select
+                    className="border p-2 rounded w-full bg-white focus:ring-2 focus:ring-blue-500"
+                    value={isCustomUnit ? 'custom' : formData.unit}
+                    onChange={(e) => {
+                        if (e.target.value === 'custom') {
+                            setIsCustomUnit(true);
+                            setCustomUnit('');
+                        } else {
+                            setIsCustomUnit(false);
+                            setFormData({ ...formData, unit: e.target.value });
+                        }
+                    }}
+                >
+                    {COMMON_UNITS.map(u => (
+                        <option key={u} value={u}>{u}</option>
+                    ))}
+                    <option value="custom">Other (Custom)...</option>
+                </select>
+                {isCustomUnit && (
+                    <input
+                        className="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500"
+                        placeholder="e.g. bundles"
+                        value={customUnit}
+                        onChange={e => setCustomUnit(e.target.value)}
+                        autoFocus
+                    />
+                )}
+            </div>
+        </div>
 
-      <DeleteConfirmModal
-        isOpen={showDeleteModal}
-        onClose={() => setShowDeleteModal(false)}
-        onConfirm={handleDelete}
-        title="Delete Item"
-        message="Are you sure you want to delete this item? This action cannot be undone."
-        itemName={item.name}
-        isLoading={deleting}
-      />
+        <div className="flex gap-4 pt-4">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="px-4 py-2 border rounded text-gray-600 hover:bg-gray-50 flex-1"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 flex-1"
+            disabled={saving}
+          >
+            {saving ? 'Saving...' : 'Update Item'}
+          </button>
+        </div>
+      </form>
     </div>
   );
 }

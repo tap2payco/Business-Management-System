@@ -35,6 +35,8 @@ export default function NewInvoiceClient({ businessId, currency, defaultDueDays 
   const [dueInDays, setDueInDays] = useState(defaultDueDays);
   const [aiNote, setAiNote] = useState('');
   const [saving, setSaving] = useState(false);
+  const [creatingItem, setCreatingItem] = useState(false);
+  const [creatingCustomer, setCreatingCustomer] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -73,6 +75,33 @@ export default function NewInvoiceClient({ businessId, currency, defaultDueDays 
     setShowSuggestions(false);
   };
 
+  const createAndSelectCustomer = async () => {
+    if (!customer.name.trim()) return;
+    setCreatingCustomer(true);
+    try {
+        const res = await fetch('/api/customers', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                name: customer.name,
+                email: customer.email || undefined,
+                phone: customer.phone || undefined,
+                address: customer.address || undefined
+            })
+        });
+        if(res.ok) {
+            const newCust = await res.json();
+            setAvailableCustomers(prev => [...prev, newCust]);
+            // alert('Customer saved to list!');
+            setShowSuggestions(false);
+        }
+    } catch(err) {
+        console.error("Failed to create customer", err);
+    } finally {
+        setCreatingCustomer(false);
+    }
+  }
+
   const handleItemSearchChange = (index: number, value: string) => {
     setItemSearchTerm(value);
     setActiveItemIndex(index);
@@ -102,6 +131,36 @@ export default function NewInvoiceClient({ businessId, currency, defaultDueDays 
     setActiveItemIndex(null);
     setItemSearchTerm('');
   };
+
+  const createAndSelectItem = async (index: number, name: string) => {
+      setCreatingItem(true);
+      try {
+          // Find current row price/tax to save if possible
+          // But POST /api/items requires validation. Let's create a basic item.
+          const res = await fetch('/api/items', {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({
+                  name: name,
+                  unitPrice: 0, // Default to 0, user will edit in invoice
+                  taxRate: 0,
+                  unit: 'pcs'
+              })
+          });
+          
+          if(res.ok) {
+              const newItem = await res.json();
+              setAvailableItems(prev => [...prev, newItem]);
+              selectItem(index, newItem);
+          } else {
+              alert("Could not create item automatically. Please check the name.");
+          }
+      } catch(err) {
+          console.error("Failed to create item", err);
+      } finally {
+          setCreatingItem(false);
+      }
+  }
 
   function setItem(i: number, key: string, value: any) { 
     setItems(prev => prev.map((it, idx) => {
@@ -185,6 +244,12 @@ export default function NewInvoiceClient({ businessId, currency, defaultDueDays 
   }
 
   async function save() {
+    // If customer is new, create them first?
+    const existing = availableCustomers.find(c => c.name.toLowerCase() === customer.name.toLowerCase());
+    if(!existing && customer.name) {
+        await createAndSelectCustomer();
+    }
+
     setSaving(true);
     const now = new Date();
     const due = new Date(now.getTime() + (dueInDays ?? 14) * 864e5);
@@ -192,6 +257,7 @@ export default function NewInvoiceClient({ businessId, currency, defaultDueDays 
     const res = await fetch('/api/invoices', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
     
     if (!res.ok) {
+        // Handling duplicate entry error maybe
       const err = await res.json();
       setSaving(false);
       alert('Failed to save invoice: ' + (err.error || 'Unknown error'));
@@ -217,12 +283,11 @@ export default function NewInvoiceClient({ businessId, currency, defaultDueDays 
 
       <div className="bg-white p-4 rounded shadow space-y-4">
         <h2 className="font-semibold">Customer</h2>
-        <h2 className="font-semibold">Customer</h2>
         <div className="relative">
           <input 
             aria-label="Customer Name" 
             className="border p-2 rounded w-full" 
-            placeholder="Name" 
+            placeholder="Name (Type new name to create)" 
             value={customer.name} 
             onChange={handleNameChange}
             onFocus={() => {
@@ -231,11 +296,11 @@ export default function NewInvoiceClient({ businessId, currency, defaultDueDays 
                 setShowSuggestions(true);
               }
             }}
-            onBlur={() => setTimeout(() => setShowSuggestions(false), 200)} // Delay to allow click
+            onBlur={() => setTimeout(() => setShowSuggestions(false), 300)} // Delay to allow click
           />
-          {showSuggestions && filteredCustomers.length > 0 && (
+          {showSuggestions && (
             <div className="absolute z-10 w-full bg-white border rounded shadow-lg max-h-60 overflow-auto mt-1">
-              {filteredCustomers.map(c => (
+              {filteredCustomers.length > 0 ? filteredCustomers.map(c => (
                 <div 
                   key={c.id} 
                   className="p-2 hover:bg-gray-100 cursor-pointer"
@@ -247,7 +312,11 @@ export default function NewInvoiceClient({ businessId, currency, defaultDueDays 
                     {c.phone}
                   </div>
                 </div>
-              ))}
+              )) : (
+                  <div className="p-3 text-sm text-gray-500 hover:bg-gray-50 cursor-pointer" onMouseDown={createAndSelectCustomer}>
+                      {creatingCustomer ? 'Saving...' : `+ Create new customer "${customer.name}"`}
+                  </div>
+              )}
             </div>
           )}
         </div>
@@ -266,7 +335,7 @@ export default function NewInvoiceClient({ businessId, currency, defaultDueDays 
               <input
                 aria-label="Search Item"
                 className="border p-2 rounded w-full"
-                placeholder="Search Item"
+                placeholder="Search Item (or new)"
                 value={activeItemIndex === i ? itemSearchTerm : (availableItems.find(x => x.id === it.itemId)?.name || '')}
                 onChange={e => handleItemSearchChange(i, e.target.value)}
                 onFocus={() => {
@@ -274,25 +343,32 @@ export default function NewInvoiceClient({ businessId, currency, defaultDueDays 
                   setItemSearchTerm(availableItems.find(x => x.id === it.itemId)?.name || '');
                   setFilteredItems(availableItems);
                 }}
-                onBlur={() => setTimeout(() => setActiveItemIndex(null), 200)}
+                onBlur={() => setTimeout(() => setActiveItemIndex(null), 300)}
               />
               {activeItemIndex === i && (
                 <div className="absolute z-20 w-full bg-white border rounded shadow-lg max-h-60 overflow-auto mt-1">
                   {filteredItems.length === 0 ? (
-                    <div className="p-2 text-gray-500 text-sm">No items found</div>
+                    <div 
+                        className="p-2 text-blue-600 hover:bg-blue-50 cursor-pointer font-medium"
+                        onMouseDown={() => createAndSelectItem(i, itemSearchTerm)}
+                    >
+                        {creatingItem ? 'Creating...' : `+ Create "${itemSearchTerm}"`}
+                    </div>
                   ) : (
-                    filteredItems.map(item => (
-                      <div 
-                        key={item.id} 
-                        className="p-2 hover:bg-gray-100 cursor-pointer"
-                        onClick={() => selectItem(i, item)}
-                      >
-                        <div className="font-medium">{item.name}</div>
-                        <div className="text-xs text-gray-500">
-                          {currency} {item.unitPrice}
+                    <>
+                        {filteredItems.map(item => (
+                        <div 
+                            key={item.id} 
+                            className="p-2 hover:bg-gray-100 cursor-pointer"
+                            onClick={() => selectItem(i, item)}
+                        >
+                            <div className="font-medium">{item.name}</div>
+                            <div className="text-xs text-gray-500">
+                            {currency} {item.unitPrice}
+                            </div>
                         </div>
-                      </div>
-                    ))
+                        ))}
+                    </>
                   )}
                 </div>
               )}
@@ -330,4 +406,3 @@ export default function NewInvoiceClient({ businessId, currency, defaultDueDays 
     </div>
   );
 }
-
