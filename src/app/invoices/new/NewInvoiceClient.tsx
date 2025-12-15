@@ -38,6 +38,9 @@ export default function NewInvoiceClient({ businessId, currency, defaultDueDays 
   const [creatingItem, setCreatingItem] = useState(false);
   const [creatingCustomer, setCreatingCustomer] = useState(false);
 
+  const [globalTaxRate, setGlobalTaxRate] = useState<number>(0);
+  const COMMON_UNITS = ['pcs', 'hrs', 'kg', 'box', 'service', 'm', 'ft'];
+
   useEffect(() => {
     Promise.all([
       fetch('/api/items').then(res => res.json()),
@@ -124,7 +127,7 @@ export default function NewInvoiceClient({ businessId, currency, defaultDueDays 
         itemId: item.id,
         description: item.name + (item.description ? ` - ${item.description}` : ''),
         unitPrice: item.unitPrice,
-        taxRate: item.taxRate,
+        taxRate: item.taxRate, // Keep original item tax rate or override? For Global Tax refactor, we usually ignore this.
         unit: item.unit || 'pcs'
       };
     }));
@@ -253,7 +256,22 @@ export default function NewInvoiceClient({ businessId, currency, defaultDueDays 
     setSaving(true);
     const now = new Date();
     const due = new Date(now.getTime() + (dueInDays ?? 14) * 864e5);
-    const payload = { businessId, customer, items: items.map(i => ({ ...i, quantity: Number(i.quantity), unitPrice: Number(i.unitPrice), unit: i.unit })), issueDate: now.toISOString(), dueDate: due.toISOString(), currency, notes };
+    // Apply global Tax Rate to all items payload
+    const payload = { 
+        businessId, 
+        customer, 
+        items: items.map(i => ({ 
+            ...i, 
+            quantity: Number(i.quantity), 
+            unitPrice: Number(i.unitPrice), 
+            unit: i.unit,
+            taxRate: globalTaxRate / 100 // Convert percent to decimal (e.g., 18% -> 0.18)
+        })), 
+        issueDate: now.toISOString(), 
+        dueDate: due.toISOString(), 
+        currency, 
+        notes 
+    };
     const res = await fetch('/api/invoices', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
     
     if (!res.ok) {
@@ -273,8 +291,16 @@ export default function NewInvoiceClient({ businessId, currency, defaultDueDays 
     }
   }
 
+  const subtotal = items.reduce((sum, item) => sum + (Number(item.quantity) * Number(item.unitPrice)), 0);
+  const totalTax = subtotal * (globalTaxRate / 100);
+  const grandTotal = subtotal + totalTax;
+
   return (
     <div className="space-y-6">
+      <datalist id="unit-options">
+          {COMMON_UNITS.map(u => <option key={u} value={u} />)}
+      </datalist>
+
       <div className="bg-white p-4 rounded shadow space-y-2">
         <label htmlFor="ai-input" className="font-medium">Describe the invoice (AI)</label>
         <textarea id="ai-input" value={aiNote} onChange={e=>setAiNote(e.target.value)} className="w-full border p-2 rounded" rows={4} placeholder='e.g. "Mchele Ltd, 5 steel pipes @ 12000 each, VAT 18%, due in 14 days"'></textarea>
@@ -331,7 +357,7 @@ export default function NewInvoiceClient({ businessId, currency, defaultDueDays 
         <h2 className="font-semibold">Items</h2>
         {items.map((it, i) => (
           <div key={i} className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-start">
-             <div className="sm:col-span-3 relative">
+             <div className="sm:col-span-5 relative">
               <input
                 aria-label="Search Item"
                 className="border p-2 rounded w-full"
@@ -377,20 +403,48 @@ export default function NewInvoiceClient({ businessId, currency, defaultDueDays 
               <input aria-label="Item Description" className="border p-2 rounded w-full" placeholder="Description" value={it.description} onChange={e=>setItem(i,'description', e.target.value)} />
             </div>
             <div className="sm:col-span-1">
-              <input aria-label="Item Unit" className="border p-2 rounded w-full" placeholder="Unit" value={it.unit || ''} onChange={e=>setItem(i, 'unit', e.target.value)} />
-            </div>
-            <div className="sm:col-span-2">
-              <input aria-label="Item Quantity" className="border p-2 rounded w-full" placeholder="Qty" type="number" value={it.quantity} onChange={e=>setItem(i,'quantity', Number(e.target.value))} />
-            </div>
-            <div className="sm:col-span-2">
-              <input aria-label="Item Price" className="border p-2 rounded w-full" placeholder="Price" type="number" value={it.unitPrice} onChange={e=>setItem(i,'unitPrice', Number(e.target.value))} />
+              <input 
+                aria-label="Item Unit" 
+                className="border p-2 rounded w-full" 
+                placeholder="Unit" 
+                value={it.unit || ''} 
+                onChange={e=>setItem(i, 'unit', e.target.value)} 
+                list="unit-options"
+              />
             </div>
             <div className="sm:col-span-1">
-              <input aria-label="Item Tax Rate" className="border p-2 rounded w-full" placeholder="Tax" value={it.taxRate ?? ''} onChange={e=>setItem(i,'taxRate', e.target.value === '' ? undefined : Number(e.target.value))} />
+              <input aria-label="Item Quantity" className="border p-2 rounded w-full" placeholder="Qty" type="number" value={it.quantity} onChange={e=>setItem(i,'quantity', Number(e.target.value))} />
+            </div>
+            <div className="sm:col-span-1">
+              <input aria-label="Item Price" className="border p-2 rounded w-full" placeholder="Price" type="number" value={it.unitPrice} onChange={e=>setItem(i,'unitPrice', Number(e.target.value))} />
             </div>
           </div>
         ))}
         <button onClick={()=>setItems([...items, { itemId: undefined, description:'', quantity:1, unitPrice:0, taxRate: undefined, unit: 'pcs' }])} className="px-3 py-1 border rounded">+ Add Item</button>
+
+        <div className="mt-4 border-t pt-4 flex flex-col items-end space-y-2">
+            <div className="flex items-center space-x-2">
+                <span className="text-gray-600">Subtotal:</span>
+                <span className="font-medium">{currency} {subtotal.toLocaleString()}</span>
+            </div>
+            <div className="flex items-center space-x-2">
+                <span className="text-gray-600">Global Tax (%):</span>
+                <input 
+                    type="number" 
+                    className="border p-1 w-20 rounded text-right" 
+                    value={globalTaxRate} 
+                    onChange={(e) => setGlobalTaxRate(Number(e.target.value))} 
+                />
+            </div>
+            <div className="flex items-center space-x-2">
+                <span className="text-gray-600">Tax Amount:</span>
+                <span className="font-medium">{currency} {totalTax.toLocaleString()}</span>
+            </div>
+            <div className="flex items-center space-x-2 text-lg font-bold border-t border-gray-200 pt-2">
+                <span>Total:</span>
+                <span>{currency} {grandTotal.toLocaleString()}</span>
+            </div>
+        </div>
       </div>
 
       <div className="bg-white p-4 rounded shadow space-y-2">
