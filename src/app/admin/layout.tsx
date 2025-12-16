@@ -12,12 +12,12 @@ export default function AdminLayout({
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
+    <div className="flex h-screen overflow-hidden bg-slate-50">
       <AdminSidebar isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
       
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Mobile Header */}
-        <header className="md:hidden border-b bg-white sticky top-0 z-30">
+        <header className="md:hidden border-b bg-white sticky top-0 z-30 flex-none">
           <div className="flex h-16 items-center px-4">
             <button
               onClick={() => setIsMobileMenuOpen(true)}
@@ -30,7 +30,7 @@ export default function AdminLayout({
           </div>
         </header>
 
-        <main className="flex-1 p-4 md:p-8">
+        <main className="flex-1 overflow-y-auto p-4 md:p-8">
           {children}
         </main>
       </div>

@@ -62,10 +62,10 @@ export function AuthenticatedLayout({
   }
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex h-screen overflow-hidden bg-gray-50">
       <MainNav isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
-      <div className="flex-1 flex flex-col min-w-0">
-        <header className="border-b bg-white sticky top-0 z-30">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <header className="border-b bg-white sticky top-0 z-30 flex-none">
           <div className="flex h-16 items-center px-4 md:px-8">
             {/* Hamburger menu button for mobile */}
             <button
@@ -80,7 +80,7 @@ export function AuthenticatedLayout({
             </div>
           </div>
         </header>
-        <main className="flex-1 p-4 md:p-8">
+        <main className="flex-1 overflow-y-auto p-4 md:p-8">
           {children}
         </main>
       </div>
