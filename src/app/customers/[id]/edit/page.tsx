@@ -11,6 +11,8 @@ interface Customer {
   email: string | null;
   phone: string | null;
   address: string | null;
+  type: string;
+  taxId: string | null;
 }
 
 export default function EditCustomerPage({ params }: { params: Promise<{ id: string }> }) {
@@ -26,7 +28,9 @@ export default function EditCustomerPage({ params }: { params: Promise<{ id: str
     name: '',
     email: '',
     phone: '',
-    address: ''
+    address: '',
+    type: 'INDIVIDUAL',
+    taxId: ''
   });
 
   useEffect(() => {
@@ -43,7 +47,9 @@ export default function EditCustomerPage({ params }: { params: Promise<{ id: str
         name: data.name,
         email: data.email || '',
         phone: data.phone || '',
-        address: data.address || ''
+        address: data.address || '',
+        type: data.type || 'INDIVIDUAL',
+        taxId: data.taxId || ''
       });
     } catch (error) {
       showError('Failed to load customer');
@@ -63,9 +69,11 @@ export default function EditCustomerPage({ params }: { params: Promise<{ id: str
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: formData.name,
+          type: formData.type,
           email: formData.email || undefined,
           phone: formData.phone || undefined,
-          address: formData.address || undefined
+          address: formData.address || undefined,
+          taxId: formData.taxId || undefined
         })
       });
 
@@ -158,9 +166,38 @@ export default function EditCustomerPage({ params }: { params: Promise<{ id: str
 
       <div className="rounded-lg border bg-white p-6">
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Type Toggle */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Customer Type</label>
+            <div className="flex bg-gray-100 p-1 rounded-lg w-max">
+                <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, type: 'INDIVIDUAL' })}
+                    className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
+                        formData.type === 'INDIVIDUAL' 
+                            ? 'bg-white text-gray-900 shadow-sm' 
+                            : 'text-gray-500 hover:text-gray-900'
+                    }`}
+                >
+                    Individual
+                </button>
+                <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, type: 'COMPANY' })}
+                    className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
+                        formData.type === 'COMPANY' 
+                            ? 'bg-white text-gray-900 shadow-sm' 
+                            : 'text-gray-500 hover:text-gray-900'
+                    }`}
+                >
+                    Company
+                </button>
+            </div>
+          </div>
+
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-              Customer Name *
+              {formData.type === 'COMPANY' ? 'Company Name *' : 'Full Name *'}
             </label>
             <input
               type="text"
@@ -171,6 +208,21 @@ export default function EditCustomerPage({ params }: { params: Promise<{ id: str
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
             />
           </div>
+
+          {formData.type === 'COMPANY' && (
+              <div>
+                <label htmlFor="taxId" className="block text-sm font-medium text-gray-700">
+                  Tax ID / VRN / TIN
+                </label>
+                <input
+                  type="text"
+                  id="taxId"
+                  value={formData.taxId}
+                  onChange={(e) => setFormData({ ...formData, taxId: e.target.value })}
+                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+                />
+              </div>
+          )}
 
           <div className="grid grid-cols-2 gap-4">
             <div>

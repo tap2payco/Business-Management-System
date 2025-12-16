@@ -2,7 +2,7 @@
 import { useState } from 'react';
 
 export default function NewCustomerPage() {
-  const [form, setForm] = useState({ name: '', email: '', phone: '', address: '' });
+  const [form, setForm] = useState({ name: '', email: '', phone: '', address: '', type: 'INDIVIDUAL', taxId: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -29,13 +29,48 @@ export default function NewCustomerPage() {
     <div className="max-w-lg mx-auto mt-10 bg-white p-8 rounded shadow">
       <h1 className="text-2xl font-bold mb-6">Add New Customer</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Customer Type Toggle */}
+        <div className="flex bg-gray-100 p-1 rounded-lg w-max mb-2">
+            <button
+                type="button"
+                onClick={() => setForm({ ...form, type: 'INDIVIDUAL' })}
+                className={`flex-1 px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
+                    (form as any).type === 'INDIVIDUAL' 
+                        ? 'bg-white text-gray-900 shadow-sm' 
+                        : 'text-gray-500 hover:text-gray-900'
+                }`}
+            >
+                Individual
+            </button>
+            <button
+                type="button"
+                onClick={() => setForm({ ...form, type: 'COMPANY' })}
+                className={`flex-1 px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
+                    (form as any).type === 'COMPANY' 
+                        ? 'bg-white text-gray-900 shadow-sm' 
+                        : 'text-gray-500 hover:text-gray-900'
+                }`}
+            >
+                Company
+            </button>
+        </div>
+
         <input
           className="border p-2 rounded w-full"
-          placeholder="Name"
+          placeholder={(form as any).type === 'COMPANY' ? "Company Name" : "Full Name"}
           value={form.name}
           onChange={e => setForm({ ...form, name: e.target.value })}
           required
         />
+
+        {(form as any).type === 'COMPANY' && (
+            <input
+                className="border p-2 rounded w-full"
+                placeholder="Tax ID / VRN / TIN"
+                value={(form as any).taxId}
+                onChange={e => setForm({ ...form, taxId: e.target.value } as any)}
+            />
+        )}
         <input
           className="border p-2 rounded w-full"
           placeholder="Email"

@@ -6,7 +6,7 @@ const COMMON_UNITS = [
 ];
 
 export default function NewItemPage() {
-  const [form, setForm] = useState({ name: '', description: '', unitPrice: '', taxRate: '', unit: 'pcs' });
+  const [form, setForm] = useState({ name: '', description: '', unitPrice: '', taxRate: '', unit: 'pcs', type: 'GOODS' });
   const [customUnit, setCustomUnit] = useState('');
   const [isCustomUnit, setIsCustomUnit] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -42,6 +42,7 @@ export default function NewItemPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: form.name.trim(),
+          type: form.type,
           description: form.description || null,
           unitPrice: unitPriceNum,
           taxRate: taxRateNum,
@@ -83,6 +84,32 @@ export default function NewItemPage() {
     <div className="max-w-lg mx-auto mt-10 bg-white p-8 rounded shadow">
       <h1 className="text-2xl font-bold mb-6">Add New Item</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Item Type Toggle */}
+        <div className="flex bg-gray-100 p-1 rounded-lg w-max">
+            <button
+                type="button"
+                onClick={() => setForm({ ...form, type: 'GOODS' })}
+                className={`flex-1 px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
+                    (form as any).type === 'GOODS' 
+                        ? 'bg-white text-gray-900 shadow-sm' 
+                        : 'text-gray-500 hover:text-gray-900'
+                }`}
+            >
+                Goods
+            </button>
+            <button
+                type="button"
+                onClick={() => setForm({ ...form, type: 'SERVICE' })}
+                className={`flex-1 px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
+                    (form as any).type === 'SERVICE' 
+                        ? 'bg-white text-gray-900 shadow-sm' 
+                        : 'text-gray-500 hover:text-gray-900'
+                }`}
+            >
+                Service
+            </button>
+        </div>
+
         <div>
             <label htmlFor="item-name" className="block text-sm font-medium text-gray-700 mb-1">Item Name</label>
             <input

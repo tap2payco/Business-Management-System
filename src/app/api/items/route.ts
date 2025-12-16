@@ -8,6 +8,7 @@ export const dynamic = 'force-dynamic';
 
 const itemSchema = z.object({
   name: z.string().min(1),
+  type: z.enum(['GOODS', 'SERVICE']).default('GOODS'),
   description: z.string().optional(),
   unitPrice: z.number().positive(),
   taxRate: z.number().min(0).max(1),
@@ -35,6 +36,7 @@ export async function GET() {
       select: {
         id: true,
         name: true,
+        type: true,
         description: true,
         unit: true,
         unitPrice: true,

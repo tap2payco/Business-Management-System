@@ -7,9 +7,11 @@ export const dynamic = 'force-dynamic';
 
 const customerSchema = z.object({
   name: z.string().min(1),
-  email: z.string().email().optional().nullable(),
-  phone: z.string().optional().nullable(),
-  address: z.string().optional().nullable()
+  type: z.enum(['INDIVIDUAL', 'COMPANY']).default('INDIVIDUAL'),
+  email: z.string().email().optional().or(z.literal('')),
+  phone: z.string().optional(),
+  address: z.string().optional(),
+  taxId: z.string().optional(),
 });
 
 export async function GET() {
@@ -28,20 +30,20 @@ export async function GET() {
         businessId: session.user.businessId
       },
       orderBy: {
-        createdAt: 'desc'
+        name: 'asc'
       },
       select: {
         id: true,
         name: true,
+        type: true,
         email: true,
         phone: true,
         address: true,
+        taxId: true,
         createdAt: true,
         updatedAt: true,
         _count: {
-          select: {
-            invoices: true
-          }
+          select: { invoices: true }
         }
       }
     });

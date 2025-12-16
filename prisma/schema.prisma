@@ -27,16 +27,29 @@ model Business {
   users           User[]
 }
 
+
+enum ItemType {
+  GOODS
+  SERVICE
+}
+
+enum CustomerType {
+  INDIVIDUAL
+  COMPANY
+}
+
 model Customer {
-  id         String    @id @default(cuid())
+  id         String       @id @default(cuid())
   businessId String
   name       String
+  type       CustomerType @default(INDIVIDUAL)
   email      String?
   phone      String?
   address    String?
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  business   Business  @relation(fields: [businessId], references: [id])
+  taxId      String?      // VRN or TIN
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  business   Business     @relation(fields: [businessId], references: [id])
   invoices   Invoice[]
 }
 
@@ -82,6 +95,7 @@ model InvoiceItem {
 model Item {
   id           String        @id @default(cuid())
   businessId   String
+  type         ItemType      @default(GOODS)
   name         String
   description  String?
   unit         String        @default("pcs")

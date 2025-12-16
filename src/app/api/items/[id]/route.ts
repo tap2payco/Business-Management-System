@@ -6,6 +6,7 @@ import { serializeItem } from '@/lib/serializers';
 
 const itemSchema = z.object({
   name: z.string().min(1),
+  type: z.enum(['GOODS', 'SERVICE']).default('GOODS'),
   description: z.string().optional(),
   unitPrice: z.number().positive(),
   taxRate: z.number().min(0).max(1),

@@ -13,6 +13,7 @@ interface Item {
   unitPrice: number;
   taxRate: number;
   unit: string;
+  type: string;
 }
 
 export default function EditItemPage({ params }: { params: { id: string } }) {
@@ -25,7 +26,8 @@ export default function EditItemPage({ params }: { params: { id: string } }) {
     description: '',
     unitPrice: '',
     taxRate: '',
-    unit: 'pcs'
+    unit: 'pcs',
+    type: 'GOODS'
   });
   const [isCustomUnit, setIsCustomUnit] = useState(false);
   const [customUnit, setCustomUnit] = useState('');
@@ -46,7 +48,8 @@ export default function EditItemPage({ params }: { params: { id: string } }) {
         description: item.description || '',
         unitPrice: String(item.unitPrice),
         taxRate: String(item.taxRate),
-        unit: item.unit || 'pcs'
+        unit: item.unit || 'pcs',
+        type: item.type || 'GOODS'
       });
       
       if (!isCommon && item.unit) {
@@ -80,7 +83,8 @@ export default function EditItemPage({ params }: { params: { id: string } }) {
           description: formData.description,
           unitPrice: Number(formData.unitPrice),
           taxRate: Number(formData.taxRate),
-          unit: finalUnit
+          unit: finalUnit,
+          type: formData.type
         })
       });
 
@@ -124,6 +128,32 @@ export default function EditItemPage({ params }: { params: { id: string } }) {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Item Type Toggle */}
+        <div className="flex bg-gray-100 p-1 rounded-lg w-max mb-4">
+            <button
+                type="button"
+                onClick={() => setFormData({ ...formData, type: 'GOODS' })}
+                className={`flex-1 px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
+                    formData.type === 'GOODS' 
+                        ? 'bg-white text-gray-900 shadow-sm' 
+                        : 'text-gray-500 hover:text-gray-900'
+                }`}
+            >
+                Goods
+            </button>
+            <button
+                type="button"
+                onClick={() => setFormData({ ...formData, type: 'SERVICE' })}
+                className={`flex-1 px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
+                    formData.type === 'SERVICE' 
+                        ? 'bg-white text-gray-900 shadow-sm' 
+                        : 'text-gray-500 hover:text-gray-900'
+                }`}
+            >
+                Service
+            </button>
+        </div>
+
         <div>
             <label htmlFor="item-name" className="block text-sm font-medium text-gray-700 mb-1">Item Name</label>
             <input
