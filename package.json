@@ -7,7 +7,8 @@
     "build": "prisma generate && next build",
     "start": "next start -p 3001",
     "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev"
+    "prisma:migrate": "prisma migrate dev",
+    "lint": "next lint"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^1.1.0",
@@ -15,6 +16,7 @@
     "@prisma/client": "^5.22.0",
     "@react-pdf/renderer": "^3.4.5",
     "@sparticuz/chromium": "^143.0.0",
+    "@supabase/supabase-js": "^2.87.1",
     "@types/bcrypt": "^6.0.0",
     "autoprefixer": "^10.4.19",
     "bcrypt": "^6.0.0",

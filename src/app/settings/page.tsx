@@ -261,7 +261,7 @@ export default function SettingsPage() {
                 <input
                   id="logo-upload"
                   type="file"
-                  accept="image/*"
+                  accept="image/png, image/jpeg, image/jpg, image/webp"
                   onChange={handleLogoUpload}
                   className="text-sm"
                 />

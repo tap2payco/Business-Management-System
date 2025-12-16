@@ -125,8 +125,9 @@ export default function EditItemPage({ params }: { params: { id: string } }) {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Item Name</label>
+            <label htmlFor="item-name" className="block text-sm font-medium text-gray-700 mb-1">Item Name</label>
             <input
+            id="item-name"
             className="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500"
             value={formData.name}
             onChange={e => setFormData({...formData, name: e.target.value})}
@@ -135,8 +136,9 @@ export default function EditItemPage({ params }: { params: { id: string } }) {
         </div>
 
         <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">Description</label>
             <input
+            id="description"
             className="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500"
             value={formData.description}
             onChange={e => setFormData({...formData, description: e.target.value})}
@@ -145,8 +147,9 @@ export default function EditItemPage({ params }: { params: { id: string } }) {
 
         <div className="grid grid-cols-2 gap-4">
             <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Unit Price</label>
+                <label htmlFor="unit-price" className="block text-sm font-medium text-gray-700 mb-1">Unit Price</label>
                 <input
+                id="unit-price"
                 className="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500"
                 type="number"
                 value={formData.unitPrice}
@@ -155,8 +158,9 @@ export default function EditItemPage({ params }: { params: { id: string } }) {
                 />
             </div>
              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Tax Rate</label>
+                <label htmlFor="tax-rate" className="block text-sm font-medium text-gray-700 mb-1">Tax Rate</label>
                 <input
+                id="tax-rate"
                 className="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500"
                 type="number"
                 step="0.01"
@@ -167,9 +171,10 @@ export default function EditItemPage({ params }: { params: { id: string } }) {
         </div>
 
         <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Unit of Measurement</label>
+            <label htmlFor="unit-select" className="block text-sm font-medium text-gray-700 mb-1">Unit of Measurement</label>
             <div className="flex gap-2">
                 <select
+                    id="unit-select"
                     className="border p-2 rounded w-full bg-white focus:ring-2 focus:ring-blue-500"
                     value={isCustomUnit ? 'custom' : formData.unit}
                     onChange={(e) => {
@@ -189,6 +194,7 @@ export default function EditItemPage({ params }: { params: { id: string } }) {
                 </select>
                 {isCustomUnit && (
                     <input
+                        aria-label="Custom Unit"
                         className="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500"
                         placeholder="e.g. bundles"
                         value={customUnit}

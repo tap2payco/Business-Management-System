@@ -84,8 +84,9 @@ export default function NewItemPage() {
       <h1 className="text-2xl font-bold mb-6">Add New Item</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Item Name</label>
+            <label htmlFor="item-name" className="block text-sm font-medium text-gray-700 mb-1">Item Name</label>
             <input
+            id="item-name"
             className="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500"
             placeholder="e.g. Website Design"
             value={form.name}
@@ -95,8 +96,9 @@ export default function NewItemPage() {
         </div>
 
         <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <label htmlFor="item-description" className="block text-sm font-medium text-gray-700 mb-1">Description</label>
             <input
+            id="item-description"
             className="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500"
             placeholder="Optional details"
             value={form.description}
@@ -106,8 +108,9 @@ export default function NewItemPage() {
 
         <div className="grid grid-cols-2 gap-4">
             <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Unit Price</label>
+                <label htmlFor="unit-price" className="block text-sm font-medium text-gray-700 mb-1">Unit Price</label>
                 <input
+                id="unit-price"
                 className="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500"
                 placeholder="0.00"
                 type="number"
@@ -117,8 +120,9 @@ export default function NewItemPage() {
                 />
             </div>
             <div>
-                 <label className="block text-sm font-medium text-gray-700 mb-1">Tax Rate (0-1)</label>
+                 <label htmlFor="tax-rate" className="block text-sm font-medium text-gray-700 mb-1">Tax Rate (0-1)</label>
                  <input
+                id="tax-rate"
                 className="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500"
                 placeholder="e.g. 0.18"
                 type="number"
@@ -130,9 +134,10 @@ export default function NewItemPage() {
         </div>
 
         <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Unit of Measurement</label>
+            <label htmlFor="unit-select" className="block text-sm font-medium text-gray-700 mb-1">Unit of Measurement</label>
             <div className="flex gap-2">
                 <select
+                    id="unit-select"
                     className="border p-2 rounded w-full bg-white focus:ring-2 focus:ring-blue-500"
                     value={isCustomUnit ? 'custom' : form.unit}
                     onChange={handleUnitChange}
@@ -144,6 +149,7 @@ export default function NewItemPage() {
                 </select>
                 {isCustomUnit && (
                     <input
+                        aria-label="Custom Unit"
                         className="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500"
                         placeholder="e.g. bundles"
                         value={customUnit}

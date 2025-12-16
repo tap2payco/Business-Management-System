@@ -428,8 +428,9 @@ export default function NewInvoiceClient({ businessId, currency, defaultDueDays 
                 <span className="font-medium">{currency} {subtotal.toLocaleString()}</span>
             </div>
             <div className="flex items-center space-x-2">
-                <span className="text-gray-600">Global Tax (%):</span>
+                <label htmlFor="global-tax" className="text-gray-600">Global Tax (%):</label>
                 <input 
+                    id="global-tax"
                     type="number" 
                     className="border p-1 w-20 rounded text-right" 
                     value={globalTaxRate} 

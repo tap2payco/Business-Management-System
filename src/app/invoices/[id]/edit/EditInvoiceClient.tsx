@@ -327,8 +327,9 @@ export default function EditInvoiceClient({ invoice }: { invoice: InvoiceData })
                 <span className="font-medium">{invoice.currency} {subtotal.toLocaleString()}</span>
             </div>
             <div className="flex items-center space-x-2">
-                <span className="text-gray-600">Global Tax (%):</span>
+                <label htmlFor="edit-global-tax" className="text-gray-600">Global Tax (%):</label>
                 <input 
+                    id="edit-global-tax"
                     type="number" 
                     className="border p-1 w-20 rounded text-right" 
                     value={globalTaxRate} 

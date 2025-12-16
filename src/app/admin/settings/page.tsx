@@ -70,6 +70,7 @@ export default function AdminSettingsPage() {
                      <button 
                         onClick={() => setMaintenanceMode(!maintenanceMode)}
                         className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${maintenanceMode ? 'bg-indigo-600' : 'bg-gray-200'}`}
+                        aria-label="Toggle Maintenance Mode"
                     >
                         <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${maintenanceMode ? 'translate-x-5' : 'translate-x-0'}`} />
                     </button>
@@ -81,6 +82,7 @@ export default function AdminSettingsPage() {
                     </div>
                      <button 
                         className="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none bg-green-500"
+                        aria-label="Toggle New Business Registration"
                     >
                         <span className="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out translate-x-5" />
                     </button>

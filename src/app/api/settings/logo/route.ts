@@ -1,43 +1,58 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile } from 'fs/promises';
-import { join } from 'path';
+import { supabaseAdmin } from '@/lib/supabase';
+import { auth } from '@/auth';
 
 export async function POST(req: NextRequest) {
   try {
+    const session = await auth();
+    if (!session?.user?.businessId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const formData = await req.formData();
     const file = formData.get('logo') as File;
 
     if (!file) {
-      return NextResponse.json(
-        { error: 'No file uploaded' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
     }
 
     // Validate file type
-    if (!file.type.startsWith('image/')) {
+    const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
       return NextResponse.json(
-        { error: 'File must be an image' },
+        { error: 'File must be an image (JPG, PNG, WebP)' },
         { status: 400 }
       );
     }
 
-    // Convert file to buffer
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Create unique filename
-    const uniqueName = `${Date.now()}-${file.name}`;
-    const publicDir = join(process.cwd(), 'public', 'uploads');
-    const filePath = join(publicDir, uniqueName);
+    // Path example: logos/business_123/170923023-logo.png
+    const timestamp = Date.now();
+    const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+    const path = `logos/${session.user.businessId}/${timestamp}-${safeName}`;
 
-    // Save file
-    await writeFile(filePath, buffer);
+    // Upload using Service Role (bypasses RLS for write)
+    const { error } = await supabaseAdmin.storage
+      .from('business-assets')
+      .upload(path, buffer, {
+        contentType: file.type,
+        upsert: true
+      });
 
-    // Return the URL for the uploaded file
-    const url = `/uploads/${uniqueName}`;
+    if (error) {
+      console.error('Supabase storage upload error:', error);
+      throw error;
+    }
 
-    return NextResponse.json({ url });
+    // Get Public URL
+    const { data: { publicUrl } } = supabaseAdmin.storage
+      .from('business-assets')
+      .getPublicUrl(path);
+
+    return NextResponse.json({ url: publicUrl });
+
   } catch (error) {
     console.error('Logo upload error:', error);
     return NextResponse.json(
