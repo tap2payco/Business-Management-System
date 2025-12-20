@@ -169,6 +169,22 @@ export default function NewItemPage() {
             </div>
         </div>
 
+        {form.type === 'GOODS' && (
+            <div>
+                <label htmlFor="stock" className="block text-sm font-medium text-gray-700 mb-1">Current Stock</label>
+                <input
+                    id="stock"
+                    className="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500"
+                    placeholder="0"
+                    type="number"
+                    min="0"
+                    value={form.stock}
+                    onChange={e => setForm({ ...form, stock: e.target.value })}
+                />
+                <p className="text-xs text-gray-500 mt-1">Enter the current stock quantity for this item</p>
+            </div>
+        )}
+
         <div>
             <label htmlFor="unit-select" className="block text-sm font-medium text-gray-700 mb-1">Unit of Measurement</label>
             <div className="flex gap-2">
