@@ -24,8 +24,10 @@ model Business {
   expenses        Expense[]
   invoices        Invoice[]
   items           Item[]
+  quotes          Quote[]
   users           User[]
 }
+
 
 
 enum ItemType {
@@ -37,6 +39,16 @@ enum CustomerType {
   INDIVIDUAL
   COMPANY
 }
+
+enum QuoteStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  REJECTED
+  EXPIRED
+  CONVERTED
+}
+
 
 model Customer {
   id         String       @id @default(cuid())
@@ -51,6 +63,7 @@ model Customer {
   updatedAt  DateTime     @updatedAt
   business   Business     @relation(fields: [businessId], references: [id])
   invoices   Invoice[]
+  quotes     Quote[]
 }
 
 model Invoice {
@@ -105,8 +118,47 @@ model Item {
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   invoiceItems InvoiceItem[]
+  quoteItems   QuoteItem[]
   business     Business      @relation(fields: [businessId], references: [id])
 }
+
+model Quote {
+  id          String      @id @default(cuid())
+  number      String      @unique
+  businessId  String
+  customerId  String
+  status      QuoteStatus @default(DRAFT)
+  issueDate   DateTime    @default(now())
+  expiryDate  DateTime?
+  validUntil  String?
+  items       QuoteItem[]
+  subtotal    Decimal     @default(0)
+  taxTotal    Decimal     @default(0)
+  grandTotal  Decimal     @default(0)
+  notes       String?
+  terms       String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  
+  business    Business    @relation(fields: [businessId], references: [id])
+  customer    Customer    @relation(fields: [customerId], references: [id])
+}
+
+model QuoteItem {
+  id          String   @id @default(cuid())
+  quoteId     String
+  itemId      String?
+  description String
+  quantity    Decimal
+  unit        String   @default("pcs")
+  unitPrice   Decimal
+  taxRate     Decimal  @default(0)
+  lineTotal   Decimal
+  
+  quote       Quote    @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  item        Item?    @relation(fields: [itemId], references: [id])
+}
+
 
 model Payment {
   id        String   @id @default(cuid())

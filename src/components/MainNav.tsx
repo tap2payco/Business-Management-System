@@ -49,6 +49,12 @@ const navItems: SidebarLink[] = [
     description: 'Create and manage invoices'
   },
   { 
+    href: '/quotes', 
+    label: 'Quotes', 
+    icon: FileText,
+    description: 'Create and manage quotations'
+  },
+  { 
     href: '/receipts', 
     label: 'Sales Receipts', 
     icon: Receipt,
