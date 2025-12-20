@@ -7,8 +7,8 @@ export const dynamic = 'force-dynamic';
 
 const quoteSchema = z.object({
   customerId: z.string().min(1),
-  issueDate: z.string().datetime().optional(),
-  expiryDate: z.string().datetime().optional(),
+  issueDate: z.string().optional(),
+  expiryDate: z.string().optional(),
   validUntil: z.string().optional(),
   notes: z.string().optional(),
   terms: z.string().optional(),
