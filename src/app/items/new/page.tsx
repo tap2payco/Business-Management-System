@@ -6,7 +6,15 @@ const COMMON_UNITS = [
 ];
 
 export default function NewItemPage() {
-  const [form, setForm] = useState({ name: '', description: '', unitPrice: '', taxRate: '', unit: 'pcs', type: 'GOODS' });
+  const [form, setForm] = useState({ 
+    name: '', 
+    description: '', 
+    unitPrice: '', 
+    taxRate: '', 
+    unit: 'pcs', 
+    type: 'GOODS',
+    stock: '' 
+  });
   const [customUnit, setCustomUnit] = useState('');
   const [isCustomUnit, setIsCustomUnit] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -46,7 +54,8 @@ export default function NewItemPage() {
           description: form.description || null,
           unitPrice: unitPriceNum,
           taxRate: taxRateNum,
-          unit: finalUnit
+          unit: finalUnit,
+          stock: form.type === 'GOODS' && form.stock ? Number(form.stock) : 0
         })
       });
 

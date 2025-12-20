@@ -57,20 +57,33 @@ export default function SettingsPage() {
   }, [canManageUsersPermission]);
 
   async function loadBusinessDetails() {
+    setLoading(true);
     try {
       const res = await fetch('/api/settings/business');
+      if (!res.ok) {
+        if (res.status === 404) {
+             // Handle case where business doesn't exist yet or data is missing
+             console.warn('Business not found');
+        }
+        throw new Error('Failed to fetch business');
+      }
       const data = await res.json();
       setBusiness(data);
     } catch (error) {
       console.error('Failed to load business details:', error);
+      setMessage('Failed to load business details. Please try reloading.');
+    } finally {
+      setLoading(false);
     }
   }
 
   async function loadUsers() {
     try {
       const res = await fetch('/api/users');
-      const data = await res.json();
-      setUsers(data);
+      if (res.ok) {
+          const data = await res.json();
+          setUsers(data);
+      }
     } catch (error) {
       console.error('Failed to load users:', error);
     }
@@ -182,7 +195,21 @@ export default function SettingsPage() {
     }
   }
 
-  if (!business) return <div>Loading...</div>;
+  if (loading && !business) return <div className="p-8 text-center text-gray-500">Loading settings...</div>;
+
+  if (!business) {
+    return (
+        <div className="max-w-4xl mx-auto py-8 px-4">
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative" role="alert">
+                <strong className="font-bold">Error loading settings.</strong>
+                <span className="block sm:inline"> {message || 'Business profile not found.'}</span>
+                <div className="mt-4">
+                    <p className="text-sm text-gray-600 mb-2">Try signing out and signing in again to refresh your session.</p>
+                </div>
+            </div>
+        </div>
+    );
+  }
 
   const templates = [
     { value: 'modern', label: 'Modern', description: 'Clean contemporary design with Outfit font' },
@@ -247,7 +274,7 @@ export default function SettingsPage() {
                 Business Logo
               </label>
               <div className="flex items-center space-x-4">
-                {business.logo && (
+                {business?.logo && (
                   <div className="relative w-32 h-32">
                     <Image
                       src={business.logo}
@@ -276,10 +303,11 @@ export default function SettingsPage() {
                 <input
                   id="businessName"
                   type="text"
-                  value={business.name}
-                  onChange={e => setBusiness({ ...business, name: e.target.value })}
+                  value={business?.name || ''}
+                  onChange={e => setBusiness({ ...business!, name: e.target.value })}
                   className="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500"
                   required
+                  disabled={!business}
                 />
               </div>
 
@@ -290,9 +318,10 @@ export default function SettingsPage() {
                 <input
                   id="email"
                   type="email"
-                  value={business.email || ''}
-                  onChange={e => setBusiness({ ...business, email: e.target.value })}
+                  value={business?.email || ''}
+                  onChange={e => setBusiness({ ...business!, email: e.target.value })}
                   className="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500"
+                  disabled={!business}
                 />
               </div>
 
@@ -303,9 +332,10 @@ export default function SettingsPage() {
                 <input
                   id="phone"
                   type="tel"
-                  value={business.phone || ''}
-                  onChange={e => setBusiness({ ...business, phone: e.target.value })}
+                  value={business?.phone || ''}
+                  onChange={e => setBusiness({ ...business!, phone: e.target.value })}
                   className="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500"
+                  disabled={!business}
                 />
               </div>
 
@@ -315,10 +345,11 @@ export default function SettingsPage() {
                 </label>
                 <textarea
                   id="address"
-                  value={business.address || ''}
-                  onChange={e => setBusiness({ ...business, address: e.target.value })}
+                  value={business?.address || ''}
+                  onChange={e => setBusiness({ ...business!, address: e.target.value })}
                   className="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500"
                   rows={3}
+                  disabled={!business}
                 />
               </div>
 
@@ -328,9 +359,10 @@ export default function SettingsPage() {
                 </label>
                 <select
                   id="currency"
-                  value={business.currency}
-                  onChange={e => setBusiness({ ...business, currency: e.target.value })}
+                  value={business?.currency || 'TZS'}
+                  onChange={e => setBusiness({ ...business!, currency: e.target.value })}
                   className="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500"
+                  disabled={!business}
                 >
                   <option value="TZS">TZS - Tanzanian Shilling</option>
                   <option value="USD">USD - US Dollar</option>
@@ -346,12 +378,13 @@ export default function SettingsPage() {
                 <input
                   id="taxRate"
                   type="number"
-                  value={business.taxRate * 100}
-                  onChange={e => setBusiness({ ...business, taxRate: Number(e.target.value) / 100 })}
+                  value={business?.taxRate ? business.taxRate * 100 : 0}
+                  onChange={e => setBusiness({ ...business!, taxRate: Number(e.target.value) / 100 })}
                   className="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500"
                   min="0"
                   max="100"
                   step="0.1"
+                  disabled={!business}
                 />
               </div>
             </div>
@@ -385,9 +418,10 @@ export default function SettingsPage() {
                     type="radio"
                     name="invoiceTemplate"
                     value={template.value}
-                    checked={business.invoiceTemplate === template.value}
-                    onChange={e => setBusiness({ ...business, invoiceTemplate: e.target.value })}
+                    checked={business?.invoiceTemplate === template.value}
+                    onChange={e => setBusiness({ ...business!, invoiceTemplate: e.target.value })}
                     className="mt-1 mr-3"
+                    disabled={!business}
                   />
                   <div>
                     <div className="font-medium text-gray-900">{template.label}</div>

@@ -6,11 +6,9 @@ import { serializeCustomer } from '@/lib/serializers';
 
 const customerSchema = z.object({
   name: z.string().min(1),
-  type: z.enum(['INDIVIDUAL', 'COMPANY']).default('INDIVIDUAL'),
   email: z.string().email().optional().or(z.literal('')),
   phone: z.string().optional(),
   address: z.string().optional(),
-  taxId: z.string().optional(),
 });
 
 export async function GET(

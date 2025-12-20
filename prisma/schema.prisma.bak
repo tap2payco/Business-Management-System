@@ -1,0 +1,206 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Business {
+  id              String     @id @default(cuid())
+  name            String
+  email           String?
+  phone           String?
+  address         String?
+  currency        String     @default("TZS")
+  taxRate         Decimal    @default(0)
+  logo            String?
+  invoiceTemplate String     @default("modern")
+  receiptTemplate String     @default("receipt")
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  customers       Customer[]
+  expenses        Expense[]
+  invoices        Invoice[]
+  items           Item[]
+  users           User[]
+}
+
+
+enum ItemType {
+  GOODS
+  SERVICE
+}
+
+enum CustomerType {
+  INDIVIDUAL
+  COMPANY
+}
+
+model Customer {
+  id         String       @id @default(cuid())
+  businessId String
+  name       String
+  type       CustomerType @default(INDIVIDUAL)
+  email      String?
+  phone      String?
+  address    String?
+  taxId      String?      // VRN or TIN
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  business   Business     @relation(fields: [businessId], references: [id])
+  invoices   Invoice[]
+}
+
+model Invoice {
+  id         String        @id @default(cuid())
+  businessId String
+  customerId String
+  number     String        @unique
+  issueDate  DateTime
+  dueDate    DateTime
+  currency   String
+  status     String        @default("DRAFT")
+  notes      String?
+  subtotal   Decimal       @default(0)
+  taxTotal   Decimal       @default(0)
+  grandTotal Decimal       @default(0)
+  amountPaid Decimal       @default(0)
+  balanceDue Decimal       @default(0)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  business   Business      @relation(fields: [businessId], references: [id])
+  customer   Customer      @relation(fields: [customerId], references: [id])
+  items      InvoiceItem[]
+  payments   Payment[]
+}
+
+model InvoiceItem {
+  id          String   @id @default(cuid())
+  invoiceId   String
+  description String
+  quantity    Decimal
+  unitPrice   Decimal
+  taxRate     Decimal
+  lineTotal   Decimal
+  itemId      String?
+  unit        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id])
+  item        Item?    @relation(fields: [itemId], references: [id])
+}
+
+model Item {
+  id           String        @id @default(cuid())
+  businessId   String
+  type         ItemType      @default(GOODS)
+  name         String
+  description  String?
+  unit         String        @default("pcs")
+  unitPrice    Decimal
+  taxRate      Decimal       @default(0)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  invoiceItems InvoiceItem[]
+  business     Business      @relation(fields: [businessId], references: [id])
+}
+
+model Payment {
+  id        String   @id @default(cuid())
+  invoiceId String
+  amount    Decimal
+  method    String
+  reference String?
+  paidAt    DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  invoice   Invoice  @relation(fields: [invoiceId], references: [id])
+  receipt   Receipt?
+}
+
+model Receipt {
+  id        String   @id @default(cuid())
+  number    String   @unique
+  paymentId String   @unique
+  issuedAt  DateTime @default(now())
+  payment   Payment  @relation(fields: [paymentId], references: [id])
+}
+
+model Expense {
+  id          String   @id @default(cuid())
+  businessId  String
+  date        DateTime
+  amount      Decimal
+  description String
+  category    String
+  reference   String?
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  business    Business @relation(fields: [businessId], references: [id])
+}
+
+model Sequence {
+  id   String @id @default(cuid())
+  kind String
+  year Int
+  next Int
+
+  @@unique([kind, year])
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  phone         String    @unique
+  password      String
+  role          String    @default("owner")
+  isSuperAdmin  Boolean   @default(false)
+  emailVerified DateTime?
+  image         String?
+  businessId    String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  accounts      Account[]
+  sessions      Session[]
+  business      Business  @relation(fields: [businessId], references: [id])
+}
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?
+  access_token       String?
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?
+  session_state      String?
+  oauth_token        String?
+  oauth_token_secret String?
+  user               User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}

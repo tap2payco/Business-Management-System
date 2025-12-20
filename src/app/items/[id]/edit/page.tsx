@@ -27,7 +27,8 @@ export default function EditItemPage({ params }: { params: { id: string } }) {
     unitPrice: '',
     taxRate: '',
     unit: 'pcs',
-    type: 'GOODS'
+    type: 'GOODS',
+    stock: ''
   });
   const [isCustomUnit, setIsCustomUnit] = useState(false);
   const [customUnit, setCustomUnit] = useState('');
@@ -49,7 +50,8 @@ export default function EditItemPage({ params }: { params: { id: string } }) {
         unitPrice: String(item.unitPrice),
         taxRate: String(item.taxRate),
         unit: item.unit || 'pcs',
-        type: item.type || 'GOODS'
+        type: item.type || 'GOODS',
+        stock: (item as any).stock || 0
       });
       
       if (!isCommon && item.unit) {
@@ -84,7 +86,8 @@ export default function EditItemPage({ params }: { params: { id: string } }) {
           unitPrice: Number(formData.unitPrice),
           taxRate: Number(formData.taxRate),
           unit: finalUnit,
-          type: formData.type
+          type: formData.type,
+          stock: formData.type === 'GOODS' ? Number((formData as any).stock) : 0
         })
       });
 
@@ -187,7 +190,7 @@ export default function EditItemPage({ params }: { params: { id: string } }) {
                 required
                 />
             </div>
-             <div>
+            <div>
                 <label htmlFor="tax-rate" className="block text-sm font-medium text-gray-700 mb-1">Tax Rate</label>
                 <input
                 id="tax-rate"
@@ -198,6 +201,18 @@ export default function EditItemPage({ params }: { params: { id: string } }) {
                 onChange={e => setFormData({...formData, taxRate: e.target.value})}
                 />
             </div>
+            {formData.type === 'GOODS' && (
+                <div>
+                   <label htmlFor="stock" className="block text-sm font-medium text-gray-700 mb-1">Current Stock</label>
+                   <input
+                   id="stock"
+                   className="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500"
+                   type="number"
+                   value={(formData as any).stock}
+                   onChange={e => setFormData({...formData, stock: e.target.value} as any)}
+                   />
+               </div>
+            )}
         </div>
 
         <div>

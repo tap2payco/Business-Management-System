@@ -8,13 +8,18 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   try {
     const session = await auth();
+    console.log('[DEBUG] Settings/Business API - Session:', JSON.stringify(session, null, 2));
+
     if (!session?.user?.businessId) {
+      console.warn('[DEBUG] No businessId in session');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const business = await prisma.business.findUnique({
       where: { id: session.user.businessId }
     });
+    
+    console.log('[DEBUG] Business Lookup Result:', business ? 'Found' : 'Not Found', session.user.businessId);
 
     if (!business) {
       return NextResponse.json(

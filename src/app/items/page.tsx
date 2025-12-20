@@ -2,12 +2,16 @@
 
 import { useState, useEffect } from 'react';
 
+import { formatCurrency } from '@/lib/formatStats';
+
 interface Item {
   id: string;
   name: string;
   description: string | null;
   unitPrice: number;
   taxRate: number;
+  stock?: number;
+  type?: 'GOODS' | 'SERVICE';
 }
 
 export default function ItemsPage() {
@@ -101,6 +105,15 @@ export default function ItemsPage() {
                     <td className="px-6 py-4">
                       <div className="text-sm text-gray-500">
                         {item.description || '-'}
+                        {item.type === 'GOODS' && (
+                            <div className="mt-1">
+                                <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                                    (item.stock || 0) > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                                }`}>
+                                    Stock: {item.stock || 0}
+                                </span>
+                            </div>
+                        )}
                       </div>
                     </td>
                     <td className="whitespace-nowrap px-6 py-4 text-right">
