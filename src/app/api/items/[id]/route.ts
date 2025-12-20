@@ -9,6 +9,9 @@ const itemSchema = z.object({
   description: z.string().optional(),
   unitPrice: z.number().positive(),
   taxRate: z.number().min(0).max(1),
+  type: z.enum(['GOODS', 'SERVICE']).optional(),
+  stock: z.number().int().min(0).optional(),
+  unit: z.string().optional(),
 });
 
 export async function GET(

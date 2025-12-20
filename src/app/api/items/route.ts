@@ -13,6 +13,7 @@ const itemSchema = z.object({
   unitPrice: z.number().positive(),
   taxRate: z.number().min(0).max(1),
   unit: z.string().default('pcs'),
+  stock: z.number().int().min(0).optional(),
 });
 
 export async function GET() {
