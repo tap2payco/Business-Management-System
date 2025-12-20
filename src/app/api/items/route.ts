@@ -40,6 +40,7 @@ export async function GET() {
         type: true,
         description: true,
         unit: true,
+        stock: true,
         unitPrice: true,
         taxRate: true,
         createdAt: true,

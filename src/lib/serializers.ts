@@ -33,6 +33,9 @@ export function serializeItem(it: any) {
     description: it.description ?? null,
     unitPrice: Number(it.unitPrice),
     taxRate: Number(it.taxRate ?? 0),
+    type: it.type ?? 'GOODS',
+    stock: it.stock ?? 0,
+    unit: it.unit ?? 'pcs',
     createdAt: it.createdAt ? new Date(it.createdAt).toISOString() : null,
     updatedAt: it.updatedAt ? new Date(it.updatedAt).toISOString() : null
   };
