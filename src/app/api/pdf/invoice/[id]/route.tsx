@@ -61,12 +61,12 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       description: item.description,
       quantity: Number(item.quantity),
       unit: item.unit || '',
-      unitPrice: Number(item.unitPrice),
+      unitPrice: Number(item.unitPrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
       taxRate: Number(item.taxRate || 0),
-      lineTotal: Number(item.lineTotal ?? (Number(item.quantity) * Number(item.unitPrice)))
+      lineTotal: Number(item.lineTotal ?? (Number(item.quantity) * Number(item.unitPrice))).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
     }));
-    const subtotal = items.reduce((s: number, it: any) => s + it.quantity * it.unitPrice, 0);
-    const taxTotal = items.reduce((s: number, it: any) => s + it.quantity * it.unitPrice * (it.taxRate || 0), 0);
+    const subtotal = items.reduce((s: number, it: any) => s + it.quantity * parseFloat(it.unitPrice.replace(/,/g, '')), 0);
+    const taxTotal = items.reduce((s: number, it: any) => s + it.quantity * parseFloat(it.unitPrice.replace(/,/g, '')) * (it.taxRate || 0), 0);
     const grandTotal = subtotal + taxTotal;
     const amountPaid = inv.payments.reduce((sum: number, p: any) => sum + Number(p.amount), 0);
     const balanceDue = grandTotal - amountPaid;
@@ -87,11 +87,11 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       items,
       issueDate: inv.issueDate ? new Date(inv.issueDate).toISOString().slice(0,10) : undefined,
       dueDate: inv.dueDate ? new Date(inv.dueDate).toISOString().slice(0,10) : undefined,
-      subtotal,
-      taxTotal,
-      grandTotal,
-      amountPaid,
-      balanceDue,
+      subtotal: subtotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+      taxTotal: taxTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+      grandTotal: grandTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+      amountPaid: amountPaid.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+      balanceDue: balanceDue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
       currency: inv.business.currency,
       notes: inv.notes || undefined
     };

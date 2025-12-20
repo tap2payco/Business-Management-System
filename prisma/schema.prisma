@@ -99,6 +99,7 @@ model Item {
   name         String
   description  String?
   unit         String        @default("pcs")
+  stock        Int           @default(0)
   unitPrice    Decimal
   taxRate      Decimal       @default(0)
   createdAt    DateTime      @default(now())
