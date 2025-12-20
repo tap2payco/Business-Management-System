@@ -144,7 +144,9 @@ export default function NewQuotePage() {
       }
 
       const quote = await res.json();
-      router.push(`/quotes/${quote.id}`);
+      
+      // Redirect to quotes list instead of detail page (safer)
+      router.push('/quotes');
       router.refresh();
     } catch (err: any) {
       setError(err.message);
