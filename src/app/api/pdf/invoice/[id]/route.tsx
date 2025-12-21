@@ -25,34 +25,18 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       return new Response('Forbidden', { status: 403 });
     }
 
-    // Prepare logo as data URL (same logic as before)
+    // Prepare logo - now stored as base64, so just use it directly
     let logoDataUrl: string | undefined;
-    console.log('Invoice business logo:', inv.business.logo);
     if (inv.business.logo) {
-      try {
-        const logPath = inv.business.logo;
-        console.log('Processing logo path:', logPath);
-        if (logPath.startsWith('http://') || logPath.startsWith('https://')) {
-          logoDataUrl = logPath;
-          console.log('Using external URL for logo');
-        } else if (logPath.startsWith('/')) {
-          const fullPath = path.join(process.cwd(), 'public', logPath);
-          console.log('Full logo path:', fullPath);
-          console.log('Logo file exists:', fs.existsSync(fullPath));
-          if (fs.existsSync(fullPath)) {
-            const buffer = fs.readFileSync(fullPath);
-            const ext = path.extname(fullPath).toLowerCase().slice(1);
-            const mimeType = ext === 'svg' ? 'image/svg+xml' : `image/${ext}`;
-            logoDataUrl = `data:${mimeType};base64,${buffer.toString('base64')}`;
-            console.log('Logo converted to base64, mime:', mimeType, 'size:', buffer.length);
-          }
-        }
-      } catch (e) {
-        console.warn('Failed to process logo:', e);
+      // If it's already a data URL (base64), use it directly
+      if (inv.business.logo.startsWith('data:')) {
+        logoDataUrl = inv.business.logo;
+      } else {
+        // Fallback for old URLs (shouldn't happen with new system)
+        console.warn('Logo is not base64, using fallback');
+        logoDataUrl = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="60" height="50" viewBox="0 0 60 50"><rect width="60" height="50" fill="%232c3e50"/><text x="30" y="30" font-size="12" fill="white" text-anchor="middle" dominant-baseline="middle">LOGO</text></svg>';
       }
-    }
-    if (!logoDataUrl) {
-      console.log('Using fallback logo');
+    } else {
       logoDataUrl = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="60" height="50" viewBox="0 0 60 50"><rect width="60" height="50" fill="%232c3e50"/><text x="30" y="30" font-size="12" fill="white" text-anchor="middle" dominant-baseline="middle">LOGO</text></svg>';
     }
 

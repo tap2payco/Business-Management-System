@@ -9,28 +9,16 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   const receipt = await prisma.receipt.findUnique({ where: { id }, include: { payment: { include: { invoice: { include: { business: true, customer: true } } } } } });
   if (!receipt) return new Response('Not found', { status: 404 });
 
-  // Prepare logo as data URL (same logic as before)
+  // Prepare logo - now stored as base64
   let logoDataUrl: string | undefined;
   if (receipt.payment?.invoice?.business?.logo) {
-    try {
-      const logPath = receipt.payment.invoice.business.logo;
-      if (logPath.startsWith('http://') || logPath.startsWith('https://')) {
-        logoDataUrl = logPath;
-      } else if (logPath.startsWith('/')) {
-        const fullPath = path.join(process.cwd(), 'public', logPath);
-        if (fs.existsSync(fullPath)) {
-          const buffer = fs.readFileSync(fullPath);
-          const ext = path.extname(fullPath).toLowerCase().slice(1);
-          const mimeType = ext === 'svg' ? 'image/svg+xml' : `image/${ext}`;
-          logoDataUrl = `data:${mimeType};base64,${buffer.toString('base64')}`;
-        }
-      }
-    } catch (e) {
-      console.warn('Failed to process receipt logo:', e);
+    if (receipt.payment.invoice.business.logo.startsWith('data:')) {
+      logoDataUrl = receipt.payment.invoice.business.logo;
+    } else {
+      logoDataUrl = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="60" height="50" viewBox="0 0 60 50"><rect width="60" height="50" fill="%2322c55e"/><text x="30" y="30" font-size="12" fill="white" text-anchor="middle" dominant-baseline="middle">LOGO</text></svg>';
     }
-  }
-  if (!logoDataUrl) {
-    logoDataUrl = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="60" height="50" viewBox="0 0 60 50"><rect width="60" height="50" fill="%232c3e50"/><text x="30" y="30" font-size="12" fill="white" text-anchor="middle" dominant-baseline="middle">LOGO</text></svg>';
+  } else {
+    logoDataUrl = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="60" height="50" viewBox="0 0 60 50"><rect width="60" height="50" fill="%2322c55e"/><text x="30" y="30" font-size="12" fill="white" text-anchor="middle" dominant-baseline="middle">LOGO</text></svg>';
   }
 
   // Prepare data for template

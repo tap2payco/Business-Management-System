@@ -25,27 +25,15 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       return new Response('Forbidden', { status: 403 });
     }
 
-    // Prepare logo
+    // Prepare logo - now stored as base64
     let logoDataUrl: string | undefined;
     if (quote.business.logo) {
-      try {
-        const logPath = quote.business.logo;
-        if (logPath.startsWith('http://') || logPath.startsWith('https://')) {
-          logoDataUrl = logPath;
-        } else if (logPath.startsWith('/')) {
-          const fullPath = path.join(process.cwd(), 'public', logPath);
-          if (fs.existsSync(fullPath)) {
-            const buffer = fs.readFileSync(fullPath);
-            const ext = path.extname(fullPath).toLowerCase().slice(1);
-            const mimeType = ext === 'svg' ? 'image/svg+xml' : `image/${ext}`;
-            logoDataUrl = `data:${mimeType};base64,${buffer.toString('base64')}`;
-          }
-        }
-      } catch (e) {
-        console.warn('Failed to process logo:', e);
+      if (quote.business.logo.startsWith('data:')) {
+        logoDataUrl = quote.business.logo;
+      } else {
+        logoDataUrl = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="60" height="50" viewBox="0 0 60 50"><rect width="60" height="50" fill="%236366f1"/><text x="30" y="30" font-size="12" fill="white" text-anchor="middle" dominant-baseline="middle">QUOTE</text></svg>';
       }
-    }
-    if (!logoDataUrl) {
+    } else {
       logoDataUrl = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="60" height="50" viewBox="0 0 60 50"><rect width="60" height="50" fill="%236366f1"/><text x="30" y="30" font-size="12" fill="white" text-anchor="middle" dominant-baseline="middle">QUOTE</text></svg>';
     }
 
