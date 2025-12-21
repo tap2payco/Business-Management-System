@@ -6,114 +6,126 @@
   <title>Quote {{number}}</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Inter', Arial, sans-serif;
-      margin: 0;
-      background: #f8fafc;
-      color: #222;
-      padding: 0;
+      background: #fff;
+      color: #1f2937;
+      font-size: 10px;
+      line-height: 1.4;
     }
     .container {
-      max-width: 800px;
-      margin: 40px auto;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.07);
-      padding: 40px 48px 32px 48px;
+      max-width: 210mm;
+      margin: 0 auto;
+      padding: 15mm;
     }
     .header {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      border-bottom: 3px solid #6366f1; /* Indigo for Quote */
-      padding-bottom: 24px;
-      margin-bottom: 32px;
+      border-bottom: 2px solid #6366f1;
+      padding-bottom: 12px;
+      margin-bottom: 16px;
     }
     .logo {
-      height: 64px;
-      max-width: 180px;
+      max-height: 50px;
+      max-width: 140px;
       object-fit: contain;
-      border-radius: 8px;
-      background: #f1f5f9;
-      padding: 8px;
     }
     .business-info {
-      font-size: 1.1em;
+      font-size: 11px;
       font-weight: 600;
       color: #6366f1;
       margin-bottom: 4px;
     }
+    .business-details {
+      font-size: 9px;
+      color: #6b7280;
+      line-height: 1.5;
+    }
     .meta {
       text-align: right;
-      font-size: 0.98em;
-      color: #64748b;
+      font-size: 9px;
+      color: #6b7280;
+    }
+    .meta h1 {
+      color: #6366f1;
+      font-size: 20px;
+      margin: 0 0 6px 0;
+      font-weight: 700;
+    }
+    .meta div {
+      margin-bottom: 2px;
     }
     .section {
-      margin-bottom: 28px;
+      margin-bottom: 14px;
     }
     .section-title {
-      font-size: 1.08em;
+      font-size: 10px;
       font-weight: 700;
       color: #6366f1;
-      margin-bottom: 8px;
+      margin-bottom: 4px;
+      text-transform: uppercase;
       letter-spacing: 0.5px;
-    }
-    .info-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 18px;
-    }
-    .info-table td {
-      padding: 2px 0;
-      font-size: 1em;
     }
     .items-table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 24px;
+      margin-bottom: 14px;
+      font-size: 9px;
     }
     .items-table th {
       background: #6366f1;
       color: #fff;
       font-weight: 600;
-      padding: 10px 8px;
-      font-size: 1em;
-      border: none;
+      padding: 6px 4px;
+      text-align: left;
     }
     .items-table td {
-      padding: 10px 8px;
+      padding: 6px 4px;
       border-bottom: 1px solid #e5e7eb;
-      font-size: 0.98em;
     }
     .items-table tr:last-child td {
       border-bottom: none;
     }
     .totals {
       float: right;
-      margin-top: 10px;
-      width: 320px;
+      width: 200px;
+      font-size: 9px;
+    }
+    .totals table {
+      width: 100%;
+      border-collapse: collapse;
     }
     .totals td {
-      padding: 6px 0;
-      font-size: 1.05em;
+      padding: 4px 0;
     }
     .totals .label {
       font-weight: 600;
-      color: #475569;
+      color: #6b7280;
       text-align: right;
-      padding-right: 16px;
+      padding-right: 12px;
     }
     .totals .value {
       text-align: right;
       font-weight: 600;
-      color: #0f172a;
+      color: #1f2937;
     }
-    .totals .grand-total td {
-      border-top: 2px solid #e2e8f0;
-      padding-top: 12px;
+    .totals .grand {
+      border-top: 2px solid #e5e7eb;
+      padding-top: 6px;
       color: #6366f1;
       font-weight: 700;
-      font-size: 1.25em;
+      font-size: 11px;
+    }
+    .terms {
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid #e5e7eb;
+      font-size: 8px;
+      color: #6b7280;
+      white-space: pre-line;
+      page-break-inside: avoid;
     }
   </style>
 </head>
@@ -122,17 +134,17 @@
     <div class="header">
       <div>
         {{#if business.logo}}
-          <img src="{{business.logo}}" class="logo" alt="Business Logo" />
+          <img src="{{business.logo}}" class="logo" alt="Logo" onerror="this.style.display='none'" />
         {{/if}}
         <div class="business-info">{{business.name}}</div>
-        <table class="info-table">
-          {{#if business.email}}<tr><td>{{business.email}}</td></tr>{{/if}}
-          {{#if business.phone}}<tr><td>{{business.phone}}</td></tr>{{/if}}
-          {{#if business.address}}<tr><td>{{business.address}}</td></tr>{{/if}}
-        </table>
+        <div class="business-details">
+          {{#if business.email}}{{business.email}}<br>{{/if}}
+          {{#if business.phone}}{{business.phone}}<br>{{/if}}
+          {{#if business.address}}{{business.address}}{{/if}}
+        </div>
       </div>
       <div class="meta">
-        <h1 style="color: #6366f1; margin: 0 0 8px 0;">QUOTE</h1>
+        <h1>QUOTE</h1>
         <div><strong>Quote #</strong> {{number}}</div>
         {{#if issueDate}}<div><strong>Date:</strong> {{issueDate}}</div>{{/if}}
         {{#if expiryDate}}<div><strong>Valid Until:</strong> {{expiryDate}}</div>{{/if}}
@@ -141,19 +153,19 @@
 
     <div class="section">
       <div class="section-title">Quote For</div>
-      <table class="info-table">
-        <tr><td><strong>{{customer.name}}</strong></td></tr>
-        {{#if customer.address}}<tr><td>{{customer.address}}</td></tr>{{/if}}
-      </table>
+      <div style="font-size: 9px;">
+        <strong>{{customer.name}}</strong><br>
+        {{#if customer.address}}{{customer.address}}{{/if}}
+      </div>
     </div>
 
     <table class="items-table">
       <thead>
         <tr>
-          <th style="text-align: left; border-top-left-radius: 6px; border-bottom-left-radius: 6px;">Description</th>
-          <th style="text-align: center; width: 80px;">Qty</th>
-          <th style="text-align: right; width: 120px;">Unit Price</th>
-          <th style="text-align: right; width: 120px; border-top-right-radius: 6px; border-bottom-right-radius: 6px;">Total</th>
+          <th style="width: 45%;">Description</th>
+          <th style="width: 15%; text-align: center;">Qty</th>
+          <th style="width: 20%; text-align: right;">Unit Price</th>
+          <th style="width: 20%; text-align: right;">Total</th>
         </tr>
       </thead>
       <tbody>
@@ -169,34 +181,25 @@
     </table>
 
     <div class="totals">
-      <table width="100%">
-        <tr>
-          <td class="label">Subtotal:</td>
-          <td class="value">{{subtotal}} {{currency}}</td>
-        </tr>
-        <tr>
-          <td class="label">Tax:</td>
-          <td class="value">{{taxTotal}} {{currency}}</td>
-        </tr>
-        <tr class="grand-total">
-          <td class="label">Grand Total:</td>
-          <td class="value">{{grandTotal}} {{currency}}</td>
-        </tr>
+      <table>
+        <tr><td class="label">Subtotal:</td><td class="value">{{subtotal}} {{currency}}</td></tr>
+        <tr><td class="label">Tax:</td><td class="value">{{taxTotal}} {{currency}}</td></tr>
+        <tr><td class="label grand">Grand Total:</td><td class="value grand">{{grandTotal}} {{currency}}</td></tr>
       </table>
     </div>
     <div style="clear: both;"></div>
 
     {{#if business.quoteTerms}}
-    <div class="section" style="margin-top: 40px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
+    <div class="terms">
       <div class="section-title">Terms & Conditions</div>
-      <div style="font-size: 0.9em; color: #4b5563; white-space: pre-line;">{{business.quoteTerms}}</div>
+      {{business.quoteTerms}}
     </div>
     {{/if}}
 
     {{#if notes}}
-    <div class="section" style="margin-top: 20px;">
+    <div class="terms">
       <div class="section-title">Notes</div>
-      <div style="font-size: 0.9em; color: #4b5563;">{{notes}}</div>
+      {{notes}}
     </div>
     {{/if}}
   </div>

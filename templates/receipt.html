@@ -6,84 +6,92 @@
   <title>Receipt {{number}}</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Inter', Arial, sans-serif;
-      margin: 0;
-      background: #f8fafc;
-      color: #222;
-      padding: 0;
+      background: #fff;
+      color: #1f2937;
+      font-size: 10px;
+      line-height: 1.4;
     }
     .container {
-      max-width: 600px;
-      margin: 40px auto;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.07);
-      padding: 40px 36px 32px 36px;
+      max-width: 180mm;
+      margin: 0 auto;
+      padding: 15mm;
     }
     .header {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      border-bottom: 3px solid #22c55e;
-      padding-bottom: 20px;
-      margin-bottom: 28px;
+      border-bottom: 2px solid #22c55e;
+      padding-bottom: 12px;
+      margin-bottom: 16px;
     }
     .logo {
-      height: 56px;
-      max-width: 160px;
+      max-height: 45px;
+      max-width: 120px;
       object-fit: contain;
-      border-radius: 8px;
-      background: #f1f5f9;
-      padding: 8px;
-      margin-bottom: 12px;
     }
     .business-info {
-      font-size: 1.08em;
+      font-size: 11px;
       font-weight: 600;
       color: #22c55e;
       margin-bottom: 4px;
     }
+    .business-details {
+      font-size: 9px;
+      color: #6b7280;
+      line-height: 1.5;
+    }
     .meta {
       text-align: right;
-      font-size: 0.98em;
-      color: #64748b;
+      font-size: 9px;
+      color: #6b7280;
+    }
+    .meta h1 {
+      color: #22c55e;
+      font-size: 18px;
+      margin: 0 0 6px 0;
+      font-weight: 700;
     }
     .section {
-      margin-bottom: 22px;
+      margin-bottom: 14px;
     }
     .section-title {
-      font-size: 1.05em;
+      font-size: 10px;
       font-weight: 700;
       color: #22c55e;
-      margin-bottom: 8px;
+      margin-bottom: 4px;
+      text-transform: uppercase;
       letter-spacing: 0.5px;
     }
-    .info-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 10px;
-    }
-    .info-table td {
-      padding: 2px 0;
-      font-size: 1em;
-    }
-    .amount-box {
-      background: #e0fce6;
-      padding: 22px 18px;
-      margin-top: 24px;
-      font-size: 1.18em;
+    .payment-box {
+      background: #f0fdf4;
+      border: 2px solid #22c55e;
       border-radius: 8px;
-      color: #166534;
-      font-weight: 700;
+      padding: 16px;
+      margin: 20px 0;
       text-align: center;
+    }
+    .payment-amount {
+      font-size: 24px;
+      font-weight: 700;
+      color: #22c55e;
+      margin-bottom: 4px;
+    }
+    .payment-label {
+      font-size: 10px;
+      color: #6b7280;
+      text-transform: uppercase;
       letter-spacing: 0.5px;
     }
     .footer {
-      margin-top: 48px;
-      font-size: 0.92em;
-      color: #94a3b8;
+      margin-top: 20px;
       text-align: center;
+      font-size: 9px;
+      color: #9ca3af;
+      padding-top: 12px;
+      border-top: 1px solid #e5e7eb;
     }
   </style>
 </head>
@@ -92,35 +100,49 @@
     <div class="header">
       <div>
         {{#if business.logo}}
-          <img src="{{business.logo}}" class="logo" alt="Business Logo" />
+          <img src="{{business.logo}}" class="logo" alt="Logo" onerror="this.style.display='none'" />
         {{/if}}
         <div class="business-info">{{business.name}}</div>
-        <table class="info-table">
-          <tr><td>{{business.address}}</td></tr>
-        </table>
+        <div class="business-details">
+          {{#if business.address}}{{business.address}}{{/if}}
+        </div>
       </div>
       <div class="meta">
+        <h1>RECEIPT</h1>
         <div><strong>Receipt #</strong> {{number}}</div>
-        <div><strong>Date:</strong> {{issuedAt}}</div>
+        {{#if issuedAt}}<div><strong>Date:</strong> {{issuedAt}}</div>{{/if}}
       </div>
     </div>
+
     <div class="section">
       <div class="section-title">Received From</div>
-      <table class="info-table">
-        <tr><td>{{customer.name}}</td></tr>
-        <tr><td>{{customer.address}}</td></tr>
-      </table>
+      <div style="font-size: 9px;">
+        <strong>{{customer.name}}</strong><br>
+        {{#if customer.address}}{{customer.address}}{{/if}}
+      </div>
     </div>
-    <div class="amount-box">
-      Amount: {{amount}} {{currency}}
+
+    <div class="payment-box">
+      <div class="payment-label">Amount Received</div>
+      <div class="payment-amount">{{amount}} {{currency}}</div>
     </div>
+
+    <div class="section">
+      <div class="section-title">Payment Details</div>
+      <div style="font-size: 9px; color: #6b7280;">
+        Payment received with thanks.
+      </div>
+    </div>
+
+    {{#if business.receiptFooter}}
     <div class="footer">
-      {{#if business.receiptFooter}}
-        {{business.receiptFooter}}
-      {{else}}
-        Thank you for your payment!
-      {{/if}}
+      {{business.receiptFooter}}
     </div>
+    {{else}}
+    <div class="footer">
+      Thank you for your business!
+    </div>
+    {{/if}}
   </div>
 </body>
 </html>
