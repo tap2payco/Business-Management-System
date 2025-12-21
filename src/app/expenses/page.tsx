@@ -44,7 +44,6 @@ export default function ExpensesPage() {
   }
 
   return (
-  return (
     <div className="p-8 space-y-8">
       <div className="flex items-center justify-between">
         <div>
