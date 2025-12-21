@@ -115,7 +115,11 @@
       Amount: {{amount}} {{currency}}
     </div>
     <div class="footer">
-      Thank you for your payment!
+      {{#if business.receiptFooter}}
+        {{business.receiptFooter}}
+      {{else}}
+        Thank you for your payment!
+      {{/if}}
     </div>
   </div>
 </body>

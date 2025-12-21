@@ -42,7 +42,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     business: {
       name: receipt.payment?.invoice?.business?.name || '',
       address: receipt.payment?.invoice?.business?.address || '',
-      logo: logoDataUrl
+      logo: logoDataUrl,
+      receiptFooter: receipt.payment?.invoice?.business?.receiptFooter || ''
     },
     customer: {
       name: receipt.payment?.invoice?.customer?.name || '',

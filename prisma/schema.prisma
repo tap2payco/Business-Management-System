@@ -18,6 +18,9 @@ model Business {
   logo            String?
   invoiceTemplate String     @default("modern")
   receiptTemplate String     @default("receipt")
+  invoiceTerms    String?
+  quoteTerms      String?
+  receiptFooter   String?
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
   customers       Customer[]

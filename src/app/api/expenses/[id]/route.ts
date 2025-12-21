@@ -8,7 +8,7 @@ const expenseSchema = z.object({
   date: z.string().or(z.date()),
   amount: z.number().positive(),
   description: z.string().min(1),
-  category: z.string().min(1),
+  category: z.enum(['SALARY', 'RENT', 'ADVERTISING', 'FUEL', 'ALLOWANCE', 'STATIONARY', 'UTILITIES', 'COMMUNICATION', 'COGS', 'TRANSPORT', 'MISCELLANEOUS']),
   reference: z.string().optional(),
   notes: z.string().optional()
 });
@@ -91,7 +91,7 @@ export async function PUT(
         date: new Date(validatedData.date),
         amount: validatedData.amount,
         description: validatedData.description,
-        category: validatedData.category,
+        category: validatedData.category as any,
         reference: validatedData.reference,
         notes: validatedData.notes
       }

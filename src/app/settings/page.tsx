@@ -16,6 +16,9 @@ interface BusinessSettings {
   logo?: string;
   invoiceTemplate: string;
   receiptTemplate: string;
+  invoiceTerms?: string;
+  quoteTerms?: string;
+  receiptFooter?: string;
 }
 
 interface User {
@@ -378,14 +381,69 @@ export default function SettingsPage() {
                 <input
                   id="taxRate"
                   type="number"
-                  value={business?.taxRate ? business.taxRate * 100 : 0}
-                  onChange={e => setBusiness({ ...business!, taxRate: Number(e.target.value) / 100 })}
+                  value={business?.taxRate !== undefined ? Math.round(business.taxRate * 100 * 10) / 10 : ''}
+                  onChange={e => {
+                    const val = e.target.value;
+                    const num = parseFloat(val);
+                    setBusiness({ ...business!, taxRate: isNaN(num) ? 0 : num / 100 });
+                  }}
                   className="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500"
                   min="0"
                   max="100"
                   step="0.1"
                   disabled={!business}
                 />
+              </div>
+
+              <div className="md:col-span-2 border-t pt-4 mt-4">
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Document Settings</h3>
+                
+                <div className="space-y-4">
+                  <div>
+                    <label htmlFor="invoiceTerms" className="block text-sm font-medium text-gray-700 mb-1">
+                      Invoice Terms & Conditions
+                    </label>
+                    <textarea
+                      id="invoiceTerms"
+                      value={business?.invoiceTerms || ''}
+                      onChange={e => setBusiness({ ...business!, invoiceTerms: e.target.value })}
+                      className="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500"
+                      rows={3}
+                      placeholder="e.g. Payment due within 30 days..."
+                      disabled={!business}
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="quoteTerms" className="block text-sm font-medium text-gray-700 mb-1">
+                      Quote Terms & Conditions
+                    </label>
+                    <textarea
+                      id="quoteTerms"
+                      value={business?.quoteTerms || ''}
+                      onChange={e => setBusiness({ ...business!, quoteTerms: e.target.value })}
+                      className="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500"
+                      rows={3}
+                      placeholder="e.g. Quote valid for 14 days..."
+                      disabled={!business}
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="receiptFooter" className="block text-sm font-medium text-gray-700 mb-1">
+                      Receipt Footer Message
+                    </label>
+                    <textarea
+                      id="receiptFooter"
+                      value={business?.receiptFooter || ''}
+                      onChange={e => setBusiness({ ...business!, receiptFooter: e.target.value })}
+                      className="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500"
+                      rows={2}
+                      placeholder="e.g. Thank you for your business!"
+                      disabled={!business}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </div>

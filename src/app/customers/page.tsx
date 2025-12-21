@@ -43,92 +43,82 @@ export default function CustomersPage() {
   }
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+    <div className="p-8 space-y-8">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold">Customers</h1>
-          <p className="mt-2 text-sm md:text-base text-gray-600">Manage your customer information</p>
+          <h1 className="text-3xl font-bold text-gray-900">Customers</h1>
+          <p className="mt-2 text-gray-600">Manage your customer information</p>
         </div>
         <button
-          className="rounded-lg bg-gray-900 px-4 py-2 text-white hover:bg-gray-800 min-h-[44px] w-full sm:w-auto"
           onClick={() => window.location.href = '/customers/new'}
+          className="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
         >
           Add Customer
         </button>
       </div>
 
-      {customers.length === 0 ? (
-        <div className="rounded-lg border bg-white p-12 text-center">
-          <p className="text-gray-600">No customers yet. Add your first customer to get started.</p>
-          <button
-            className="mt-4 rounded-lg bg-gray-900 px-4 py-2 text-white hover:bg-gray-800"
-            onClick={() => window.location.href = '/customers/new'}
-          >
-            Add Customer
-          </button>
-        </div>
-      ) : (
-        <div className="table-responsive rounded-lg border bg-white">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-3 md:px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                  Name
-                </th>
-                <th className="hidden md:table-cell px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                  Email
-                </th>
-                <th className="hidden sm:table-cell px-3 md:px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                  Phone
-                </th>
-                <th className="hidden lg:table-cell px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                  Address
-                </th>
-                <th className="px-3 md:px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {customers.map((customer) => (
-                <tr key={customer.id} className="hover:bg-gray-50">
-                  <td className="px-3 md:px-6 py-4">
-                    <div className="text-sm font-medium text-gray-900">
-                      {customer.name}
-                    </div>
-                    <div className="md:hidden text-xs text-gray-500 mt-1">
-                      {customer.email || customer.phone || '-'}
-                    </div>
-                  </td>
-                  <td className="hidden md:table-cell whitespace-nowrap px-6 py-4">
-                    <div className="text-sm text-gray-500">
-                      {customer.email || '-'}
-                    </div>
-                  </td>
-                  <td className="hidden sm:table-cell whitespace-nowrap px-3 md:px-6 py-4">
-                    <div className="text-sm text-gray-500">
-                      {customer.phone || '-'}
-                    </div>
-                  </td>
-                  <td className="hidden lg:table-cell whitespace-nowrap px-6 py-4">
-                    <div className="text-sm text-gray-500">
-                      {customer.address || '-'}
-                    </div>
-                  </td>
-                  <td className="whitespace-nowrap px-3 md:px-6 py-4 text-right text-sm">
-                    <button 
-                      onClick={() => window.location.href = `/customers/${customer.id}/edit`}
-                      className="text-indigo-600 hover:text-indigo-900 min-h-[44px] px-2"
-                    >
-                      Edit
-                    </button>
-                  </td>
+      <div className="bg-white rounded-lg shadow overflow-hidden border border-gray-200">
+        {customers.length === 0 ? (
+          <div className="p-12 text-center text-gray-500">
+            <p>No customers yet. Add your first customer to get started.</p>
+            <button
+              className="mt-4 text-blue-600 hover:text-blue-800 font-medium"
+              onClick={() => window.location.href = '/customers/new'}
+            >
+              Create Customer &rarr;
+            </button>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    Name
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    Contact Info
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    Address
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
+                    Actions
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {customers.map((customer) => (
+                  <tr key={customer.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-gray-900">
+                        {customer.name}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">{customer.email || '-'}</div>
+                      <div className="text-sm text-gray-500">{customer.phone}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-500 truncate max-w-xs">
+                        {customer.address || '-'}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <button 
+                        onClick={() => window.location.href = `/customers/${customer.id}/edit`}
+                        className="text-indigo-600 hover:text-indigo-900"
+                      >
+                        Edit
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

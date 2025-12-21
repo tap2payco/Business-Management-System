@@ -67,6 +67,9 @@ export async function PUT(req: NextRequest) {
         logo: data.logo,
         invoiceTemplate: data.invoiceTemplate,
         receiptTemplate: data.receiptTemplate,
+        invoiceTerms: data.invoiceTerms,
+        quoteTerms: data.quoteTerms,
+        receiptFooter: data.receiptFooter,
       }
     });
 

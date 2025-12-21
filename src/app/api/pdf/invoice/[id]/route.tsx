@@ -78,7 +78,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
         phone: inv.business.phone || undefined,
         address: inv.business.address || undefined,
         currency: inv.business.currency,
-        logo: logoDataUrl
+        logo: logoDataUrl,
+        invoiceTerms: inv.business.invoiceTerms || undefined
       },
       customer: {
         name: inv.customer.name,

@@ -51,20 +51,34 @@ export default function NewExpensePage() {
           onChange={e => setForm({ ...form, amount: e.target.value })}
           required
         />
-        <input
-          className="border p-2 rounded w-full"
-          placeholder="Description"
-          value={form.description}
-          onChange={e => setForm({ ...form, description: e.target.value })}
-          required
-        />
-        <input
-          className="border p-2 rounded w-full"
-          placeholder="Category"
-          value={form.category}
-          onChange={e => setForm({ ...form, category: e.target.value })}
-          required
-        />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <input
+             className="border p-2 rounded w-full"
+             placeholder="Description"
+             value={form.description}
+             onChange={e => setForm({ ...form, description: e.target.value })}
+             required
+           />
+           <select
+             className="border p-2 rounded w-full bg-white"
+             value={form.category}
+             onChange={e => setForm({ ...form, category: e.target.value })}
+             required
+           >
+             <option value="">Select Category</option>
+             <option value="SALARY">Salary</option>
+             <option value="RENT">Rent</option>
+             <option value="ADVERTISING">Advertising</option>
+             <option value="FUEL">Fuel</option>
+             <option value="ALLOWANCE">Allowance</option>
+             <option value="STATIONARY">Stationary</option>
+             <option value="UTILITIES">Utilities</option>
+             <option value="COMMUNICATION">Communication</option>
+             <option value="COGS">COGS (Cost of Goods)</option>
+             <option value="TRANSPORT">Transport</option>
+             <option value="MISCELLANEOUS">Miscellaneous</option>
+           </select>
+        </div>
         <input
           className="border p-2 rounded w-full"
           placeholder="Reference (optional)"

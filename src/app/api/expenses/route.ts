@@ -10,7 +10,7 @@ const expenseSchema = z.object({
   date: z.string().or(z.date()),
   amount: z.number().positive(),
   description: z.string().min(1),
-  category: z.string().min(1),
+  category: z.enum(['SALARY', 'RENT', 'ADVERTISING', 'FUEL', 'ALLOWANCE', 'STATIONARY', 'UTILITIES', 'COMMUNICATION', 'COGS', 'TRANSPORT', 'MISCELLANEOUS']),
   reference: z.string().optional(),
   notes: z.string().optional()
 });
@@ -41,7 +41,8 @@ export async function GET() {
         category: true,
         reference: true,
         createdAt: true,
-        updatedAt: true
+        updatedAt: true,
+        notes: true
       }
     });
 
