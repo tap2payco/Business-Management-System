@@ -137,27 +137,7 @@ export default function ViewQuotePage() {
     }
   }
 
-  async function deleteQuote() {
-    if (!id) return;
-    if (!confirm('Are you sure you want to delete this quote? This action cannot be undone.')) return;
 
-    setActionLoading(true);
-    try {
-      const res = await fetch(`/api/quotes/${id}`, {
-        method: 'DELETE',
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Failed to delete quote');
-      }
-
-      router.push('/quotes');
-      router.refresh();
-    } catch (error: any) {
-      console.error('Failed to delete quote:', error);
-      alert(error.message || 'Failed to delete quote');
-    } finally {
       setActionLoading(false);
     }
   }
