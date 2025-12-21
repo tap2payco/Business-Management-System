@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import SearchInput from '@/components/ui/SearchInput';
 
 interface Expense {
   id: string;
@@ -14,6 +16,15 @@ interface Expense {
 export default function ExpensesPage() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const query = searchParams.get('query') || '';
+
+  const filteredExpenses = expenses.filter(expense => 
+    expense.description.toLowerCase().includes(query.toLowerCase()) ||
+    expense.category.toLowerCase().includes(query.toLowerCase()) ||
+    (expense.reference && expense.reference.toLowerCase().includes(query.toLowerCase()))
+  );
 
   useEffect(() => {
     async function fetchExpenses() {
@@ -58,16 +69,24 @@ export default function ExpensesPage() {
         </button>
       </div>
 
+      <div className="w-full max-w-sm">
+        <SearchInput placeholder="Search expenses..." />
+      </div>
+
       <div className="bg-white rounded-lg shadow overflow-hidden border border-gray-200">
-        {expenses.length === 0 ? (
+        {filteredExpenses.length === 0 ? (
           <div className="p-12 text-center text-gray-500">
-            <p>No expenses yet. Record your first expense to get started.</p>
-            <button
-              className="mt-4 text-blue-600 hover:text-blue-800 font-medium"
-              onClick={() => window.location.href = '/expenses/new'}
-            >
-              Record Expense &rarr;
-            </button>
+            {query ? 'No expenses match your search.' : (
+              <>
+                <p>No expenses yet. Record your first expense to get started.</p>
+                <button
+                  className="mt-4 text-blue-600 hover:text-blue-800 font-medium"
+                  onClick={() => window.location.href = '/expenses/new'}
+                >
+                  Record Expense &rarr;
+                </button>
+              </>
+            )}
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -95,7 +114,7 @@ export default function ExpensesPage() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {expenses.map((expense) => (
+                {filteredExpenses.map((expense) => (
                   <tr key={expense.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">

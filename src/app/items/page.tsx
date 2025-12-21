@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import SearchInput from '@/components/ui/SearchInput';
 
 import { formatCurrency } from '@/lib/formatStats';
 
@@ -17,6 +19,14 @@ interface Item {
 export default function ItemsPage() {
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const query = searchParams.get('query') || '';
+
+  const filteredItems = items.filter(item => 
+    item.name.toLowerCase().includes(query.toLowerCase()) ||
+    item.description?.toLowerCase().includes(query.toLowerCase())
+  );
 
   useEffect(() => {
     async function fetchItems() {
@@ -61,15 +71,23 @@ export default function ItemsPage() {
         </button>
       </div>
 
-      {items.length === 0 ? (
+      <div className="w-full max-w-sm">
+        <SearchInput placeholder="Search items..." />
+      </div>
+
+      {filteredItems.length === 0 ? (
         <div className="rounded-lg border bg-white p-12 text-center">
-          <p className="text-gray-600">No items yet. Create your first item to get started.</p>
-          <button
-            className="mt-4 rounded-lg bg-gray-900 px-4 py-2 text-white hover:bg-gray-800"
-            onClick={() => window.location.href = '/items/new'}
-          >
-            Add Item
-          </button>
+          <p className="text-gray-600">
+            {query ? 'No items match your search.' : 'No items yet. Create your first item to get started.'}
+          </p>
+          {!query && (
+            <button
+                className="mt-4 rounded-lg bg-gray-900 px-4 py-2 text-white hover:bg-gray-800"
+                onClick={() => window.location.href = '/items/new'}
+            >
+                Add Item
+            </button>
+          )}
         </div>
       ) : (
         <div className="rounded-lg border bg-white">
@@ -95,7 +113,7 @@ export default function ItemsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {items.map((item) => (
+                {filteredItems.map((item) => (
                   <tr key={item.id} className="hover:bg-gray-50">
                     <td className="whitespace-nowrap px-6 py-4">
                       <div className="text-sm font-medium text-gray-900">

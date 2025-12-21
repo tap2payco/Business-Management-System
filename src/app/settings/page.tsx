@@ -278,13 +278,12 @@ export default function SettingsPage() {
               </label>
               <div className="flex items-center space-x-4">
                 {business?.logo && (
-                  <div className="relative w-32 h-32">
-                    <Image
+                  <div className="relative w-32 h-32 border rounded overflow-hidden">
+                    {/* Using standard img tag to avoid Next.js Image optimization issues with external URLs */}
+                    <img
                       src={business.logo}
                       alt="Business logo"
-                      fill
-                      sizes="128px"
-                      className="object-contain rounded"
+                      className="w-full h-full object-contain"
                     />
                   </div>
                 )}

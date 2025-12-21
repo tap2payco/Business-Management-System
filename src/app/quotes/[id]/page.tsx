@@ -112,6 +112,56 @@ export default function ViewQuotePage() {
     }
   }
 
+  async function deleteQuote() {
+    if (!id) return;
+    if (!confirm('Are you sure you want to delete this quote? This action cannot be undone.')) return;
+
+    setActionLoading(true);
+    try {
+      const res = await fetch(`/api/quotes/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to delete quote');
+      }
+
+      router.push('/quotes');
+      router.refresh();
+    } catch (error: any) {
+      console.error('Failed to delete quote:', error);
+      alert(error.message || 'Failed to delete quote');
+    } finally {
+      setActionLoading(false);
+    }
+  }
+
+  async function deleteQuote() {
+    if (!id) return;
+    if (!confirm('Are you sure you want to delete this quote? This action cannot be undone.')) return;
+
+    setActionLoading(true);
+    try {
+      const res = await fetch(`/api/quotes/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to delete quote');
+      }
+
+      router.push('/quotes');
+      router.refresh();
+    } catch (error: any) {
+      console.error('Failed to delete quote:', error);
+      alert(error.message || 'Failed to delete quote');
+    } finally {
+      setActionLoading(false);
+    }
+  }
+
   function getStatusBadge(status: string) {
     const styles: Record<string, string> = {
       DRAFT: 'bg-gray-100 text-gray-800',
@@ -271,14 +321,34 @@ export default function ViewQuotePage() {
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Actions</h2>
         <div className="flex flex-wrap gap-3">
           {quote.status === 'DRAFT' && (
-            <button
-              onClick={() => updateStatus('SENT')}
-              disabled={actionLoading}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
-            >
-              Mark as Sent
-            </button>
+            <>
+              <button
+                onClick={() => updateStatus('SENT')}
+                disabled={actionLoading}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              >
+                Mark as Sent
+              </button>
+              <button
+                onClick={deleteQuote}
+                disabled={actionLoading}
+                className="px-4 py-2 border border-red-300 text-red-700 rounded-lg hover:bg-red-50 disabled:opacity-50 transition-colors"
+                title="Delete Draft Quote"
+              >
+                Delete Quote
+              </button>
+            </>
           )}
+          
+          <a
+            href={`/api/pdf/quote/${id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 flex items-center gap-2 transition-colors"
+          >
+            <span>Download PDF</span>
+          </a>
+
           {(quote.status === 'SENT' || quote.status === 'DRAFT') && (
             <>
               <button

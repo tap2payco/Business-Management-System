@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import SearchInput from '@/components/ui/SearchInput';
 
 interface Quote {
   id: string;
@@ -18,9 +19,16 @@ interface Quote {
 
 export default function QuotesPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const query = searchParams.get('query') || '';
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>('');
+
+  const filteredQuotes = quotes.filter(quote => 
+    quote.number.toLowerCase().includes(query.toLowerCase()) ||
+    quote.customer.name.toLowerCase().includes(query.toLowerCase())
+  );
 
   useEffect(() => {
     loadQuotes();
@@ -76,11 +84,14 @@ export default function QuotesPage() {
       </div>
 
       {/* Filters */}
-      <div className="mb-6 flex gap-4">
+      <div className="mb-6 flex flex-col md:flex-row gap-4 items-center">
+        <div className="w-full max-w-sm">
+            <SearchInput placeholder="Search quotes..." />
+        </div>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full md:w-auto"
         >
           <option value="">All Statuses</option>
           <option value="DRAFT">Draft</option>
@@ -121,14 +132,14 @@ export default function QuotesPage() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {quotes.length === 0 ? (
+            {filteredQuotes.length === 0 ? (
               <tr>
                 <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
-                  No quotes found. Create your first quote to get started!
+                  {query ? 'No quotes match your search.' : 'No quotes found. Create your first quote to get started!'}
                 </td>
               </tr>
             ) : (
-              quotes.map((quote) => (
+              filteredQuotes.map((quote) => (
                 <tr key={quote.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">{quote.number}</div>

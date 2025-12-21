@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import SearchInput from '@/components/ui/SearchInput';
 
 interface Customer {
   id: string;
@@ -13,6 +15,15 @@ interface Customer {
 export default function CustomersPage() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const query = searchParams.get('query') || '';
+
+  const filtered = customers.filter(c => 
+    c.name.toLowerCase().includes(query.toLowerCase()) ||
+    (c.email && c.email.toLowerCase().includes(query.toLowerCase())) ||
+    (c.phone && c.phone.includes(query))
+  );
 
   useEffect(() => {
     async function fetchCustomers() {
@@ -57,16 +68,24 @@ export default function CustomersPage() {
         </button>
       </div>
 
+      <div className="w-full max-w-sm">
+        <SearchInput placeholder="Search customers..." />
+      </div>
+
       <div className="bg-white rounded-lg shadow overflow-hidden border border-gray-200">
-        {customers.length === 0 ? (
+        {filtered.length === 0 ? (
           <div className="p-12 text-center text-gray-500">
-            <p>No customers yet. Add your first customer to get started.</p>
-            <button
-              className="mt-4 text-blue-600 hover:text-blue-800 font-medium"
-              onClick={() => window.location.href = '/customers/new'}
-            >
-              Create Customer &rarr;
-            </button>
+            {query ? 'No customers match your search.' : (
+              <>
+                <p>No customers yet. Add your first customer to get started.</p>
+                <button
+                  className="mt-4 text-blue-600 hover:text-blue-800 font-medium"
+                  onClick={() => window.location.href = '/customers/new'}
+                >
+                  Create Customer &rarr;
+                </button>
+              </>
+            )}
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -88,7 +107,7 @@ export default function CustomersPage() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {customers.map((customer) => (
+                {filtered.map((customer) => (
                   <tr key={customer.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">
