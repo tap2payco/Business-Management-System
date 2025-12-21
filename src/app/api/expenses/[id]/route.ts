@@ -8,7 +8,7 @@ const expenseSchema = z.object({
   date: z.string().or(z.date()),
   amount: z.number().positive(),
   description: z.string().min(1),
-  category: z.enum(['SALARY', 'RENT', 'ADVERTISING', 'FUEL', 'ALLOWANCE', 'STATIONARY', 'UTILITIES', 'COMMUNICATION', 'COGS', 'TRANSPORT', 'MISCELLANEOUS']),
+  category: z.string().min(1),
   reference: z.string().optional(),
   notes: z.string().optional()
 });
