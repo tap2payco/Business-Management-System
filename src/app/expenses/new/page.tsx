@@ -3,6 +3,7 @@ import { useState } from 'react';
 
 export default function NewExpensePage() {
   const [form, setForm] = useState({ date: '', amount: '', description: '', category: '', reference: '', notes: '' });
+  const [isCustomCategory, setIsCustomCategory] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -59,25 +60,46 @@ export default function NewExpensePage() {
              onChange={e => setForm({ ...form, description: e.target.value })}
              required
            />
-           <select
-             className="border p-2 rounded w-full bg-white"
-             value={form.category}
-             onChange={e => setForm({ ...form, category: e.target.value })}
-             required
-           >
-             <option value="">Select Category</option>
-             <option value="SALARY">Salary</option>
-             <option value="RENT">Rent</option>
-             <option value="ADVERTISING">Advertising</option>
-             <option value="FUEL">Fuel</option>
-             <option value="ALLOWANCE">Allowance</option>
-             <option value="STATIONARY">Stationary</option>
-             <option value="UTILITIES">Utilities</option>
-             <option value="COMMUNICATION">Communication</option>
-             <option value="COGS">COGS (Cost of Goods)</option>
-             <option value="TRANSPORT">Transport</option>
-             <option value="MISCELLANEOUS">Miscellaneous</option>
-           </select>
+           <div className="flex flex-col gap-2">
+             <select
+               className="border p-2 rounded w-full bg-white"
+               value={isCustomCategory ? 'CUSTOM' : form.category}
+               onChange={(e) => {
+                 if (e.target.value === 'CUSTOM') {
+                    setIsCustomCategory(true);
+                    setForm({ ...form, category: '' });
+                 } else {
+                    setIsCustomCategory(false);
+                    setForm({ ...form, category: e.target.value });
+                 }
+               }}
+               required
+             >
+               <option value="">Select Category</option>
+               <option value="SALARY">Salary</option>
+               <option value="RENT">Rent</option>
+               <option value="ADVERTISING">Advertising</option>
+               <option value="FUEL">Fuel</option>
+               <option value="ALLOWANCE">Allowance</option>
+               <option value="STATIONARY">Stationary</option>
+               <option value="UTILITIES">Utilities</option>
+               <option value="COMMUNICATION">Communication</option>
+               <option value="COGS">COGS (Cost of Goods)</option>
+               <option value="TRANSPORT">Transport</option>
+               <option value="MISCELLANEOUS">Miscellaneous</option>
+               <option value="CUSTOM">Custom Category...</option>
+             </select>
+             {isCustomCategory && (
+                <input 
+                    type="text" 
+                    className="border p-2 rounded w-full"
+                    placeholder="Enter custom category"
+                    value={form.category}
+                    onChange={(e) => setForm({...form, category: e.target.value.toUpperCase()})}
+                    required
+                />
+             )}
+           </div>
         </div>
         <input
           className="border p-2 rounded w-full"
