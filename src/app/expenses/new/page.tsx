@@ -61,20 +61,20 @@ export default function NewExpensePage() {
              required
            />
            <div className="flex flex-col gap-2">
-             <select
-               className="border p-2 rounded w-full bg-white"
-               value={isCustomCategory ? 'CUSTOM' : form.category}
-               onChange={(e) => {
-                 if (e.target.value === 'CUSTOM') {
-                    setIsCustomCategory(true);
-                    setForm({ ...form, category: '' });
-                 } else {
-                    setIsCustomCategory(false);
-                    setForm({ ...form, category: e.target.value });
-                 }
-               }}
-               required
-             >
+              <select
+                className="border p-2 rounded w-full bg-white"
+                value={isCustomCategory ? 'CUSTOM' : form.category}
+                onChange={(e) => {
+                  if (e.target.value === 'CUSTOM') {
+                     setIsCustomCategory(true);
+                     setForm({ ...form, category: '' });
+                  } else {
+                     setIsCustomCategory(false);
+                     setForm({ ...form, category: e.target.value });
+                  }
+                }}
+                required={!isCustomCategory}
+              >
                <option value="">Select Category</option>
                <option value="SALARY">Salary</option>
                <option value="RENT">Rent</option>
