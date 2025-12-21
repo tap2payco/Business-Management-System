@@ -138,9 +138,6 @@ export default function ViewQuotePage() {
   }
 
 
-      setActionLoading(false);
-    }
-  }
 
   function getStatusBadge(status: string) {
     const styles: Record<string, string> = {
