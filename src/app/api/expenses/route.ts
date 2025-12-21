@@ -58,6 +58,7 @@ export async function GET() {
   }
 }
 
+
 export async function POST(req: Request) {
   try {
     const session = await auth();
@@ -70,7 +71,10 @@ export async function POST(req: Request) {
     }
 
     const data = await req.json();
+    console.log('Received expense data:', JSON.stringify(data, null, 2));
+    
     const validatedData = expenseSchema.parse(data);
+    console.log('Validated expense data:', JSON.stringify(validatedData, null, 2));
 
     const expense = await prisma.expense.create({
       data: {
@@ -79,13 +83,16 @@ export async function POST(req: Request) {
         amount: validatedData.amount,
         description: validatedData.description,
         category: validatedData.category,
-        reference: validatedData.reference,
-        notes: validatedData.notes
+        reference: validatedData.reference || null,
+        notes: validatedData.notes || null
       }
     });
+    
+    console.log('Created expense:', expense.id);
     return NextResponse.json(serializeExpense(expense));
   } catch (error) {
     if (error instanceof z.ZodError) {
+      console.error('Validation error:', JSON.stringify(error.errors, null, 2));
       return NextResponse.json(
         { error: 'Invalid expense data', details: error.errors },
         { status: 400 }
@@ -93,8 +100,9 @@ export async function POST(req: Request) {
     }
 
     console.error('Create expense error:', error);
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
     return NextResponse.json(
-      { error: 'Failed to create expense' },
+      { error: error instanceof Error ? error.message : 'Failed to create expense' },
       { status: 500 }
     );
   }
