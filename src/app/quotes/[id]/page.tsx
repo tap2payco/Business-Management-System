@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 
 interface Quote {
   id: string;
@@ -33,20 +33,24 @@ interface Quote {
   }>;
 }
 
-export default function ViewQuotePage({ params }: { params: { id: string } }) {
+export default function ViewQuotePage() {
   const router = useRouter();
+  const params = useParams();
+  const id = params?.id as string;
   const [quote, setQuote] = useState<Quote | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    loadQuote();
-  }, []);
+    if (id) {
+      loadQuote();
+    }
+  }, [id]);
 
   async function loadQuote() {
     try {
-      const res = await fetch(`/api/quotes/${params.id}`);
+      const res = await fetch(`/api/quotes/${id}`);
       if (!res.ok) throw new Error('Failed to fetch quote');
       const data = await res.json();
       setQuote(data);
@@ -59,11 +63,12 @@ export default function ViewQuotePage({ params }: { params: { id: string } }) {
   }
 
   async function updateStatus(status: string) {
+    if (!id) return;
     if (!confirm(`Are you sure you want to mark this quote as ${status}?`)) return;
 
     setActionLoading(true);
     try {
-      const res = await fetch(`/api/quotes/${params.id}`, {
+      const res = await fetch(`/api/quotes/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),
@@ -82,11 +87,12 @@ export default function ViewQuotePage({ params }: { params: { id: string } }) {
   }
 
   async function convertToInvoice() {
+    if (!id) return;
     if (!confirm('Convert this quote to an invoice? This action cannot be undone.')) return;
 
     setActionLoading(true);
     try {
-      const res = await fetch(`/api/quotes/${params.id}/convert`, {
+      const res = await fetch(`/api/quotes/${id}/convert`, {
         method: 'POST',
       });
 
@@ -165,7 +171,7 @@ export default function ViewQuotePage({ params }: { params: { id: string } }) {
           </button>
           {(quote.status === 'DRAFT' || quote.status === 'SENT') && (
             <button
-              onClick={() => router.push(`/quotes/${quote.id}/edit`)}
+              onClick={() => router.push(`/quotes/${id}/edit`)}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
               Edit

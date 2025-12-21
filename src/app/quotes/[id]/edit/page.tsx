@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 
 interface Customer {
   id: string;
@@ -44,8 +44,10 @@ interface Quote {
   }>;
 }
 
-export default function EditQuotePage({ params }: { params: { id: string } }) {
+export default function EditQuotePage() {
   const router = useRouter();
+  const params = useParams();
+  const id = params?.id as string;
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
@@ -65,12 +67,14 @@ export default function EditQuotePage({ params }: { params: { id: string } }) {
   useEffect(() => {
     loadCustomers();
     loadItems();
-    loadQuote();
-  }, []);
+    if (id) {
+      loadQuote();
+    }
+  }, [id]);
 
   async function loadQuote() {
     try {
-      const res = await fetch(`/api/quotes/${params.id}`);
+      const res = await fetch(`/api/quotes/${id}`);
       if (!res.ok) throw new Error('Failed to fetch quote');
       
       const quote: Quote = await res.json();
@@ -186,7 +190,7 @@ export default function EditQuotePage({ params }: { params: { id: string } }) {
         throw new Error('Please add at least one line item');
       }
 
-      const res = await fetch(`/api/quotes/${params.id}`, {
+      const res = await fetch(`/api/quotes/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -201,7 +205,7 @@ export default function EditQuotePage({ params }: { params: { id: string } }) {
         throw new Error(data.error || 'Failed to update quote');
       }
 
-      router.push(`/quotes/${params.id}`);
+      router.push(`/quotes/${id}`);
       router.refresh();
     } catch (err: any) {
       setError(err.message);
@@ -468,7 +472,7 @@ export default function EditQuotePage({ params }: { params: { id: string } }) {
         <div className="flex gap-4">
           <button
             type="button"
-            onClick={() => router.push(`/quotes/${params.id}`)}
+            onClick={() => router.push(`/quotes/${id}`)}
             className="flex-1 px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
           >
             Cancel
