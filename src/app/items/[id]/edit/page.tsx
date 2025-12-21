@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 
 const COMMON_UNITS = [
     'pcs', 'kg', 'g', 'm', 'cm', 'l', 'ml', 'hrs', 'days', 'service', 'box', 'pack'
@@ -16,8 +16,10 @@ interface Item {
   type: string;
 }
 
-export default function EditItemPage({ params }: { params: { id: string } }) {
+export default function EditItemPage() {
   const router = useRouter();
+  const params = useParams();
+  const id = params?.id as string;
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -34,12 +36,14 @@ export default function EditItemPage({ params }: { params: { id: string } }) {
   const [customUnit, setCustomUnit] = useState('');
 
   useEffect(() => {
-    fetchItem();
-  }, [params.id]);
+    if (id) {
+      fetchItem();
+    }
+  }, [id]);
 
   async function fetchItem() {
     try {
-      const res = await fetch(`/api/items/${params.id}`);
+      const res = await fetch(`/api/items/${id}`);
       if (!res.ok) throw new Error('Failed to fetch item');
       const item: Item = await res.json();
       
