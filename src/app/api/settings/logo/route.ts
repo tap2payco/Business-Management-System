@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase';
 import { auth } from '@/auth';
 
 export async function POST(req: NextRequest) {
@@ -25,33 +24,21 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-
-    // Path example: logos/business_123/170923023-logo.png
-    const timestamp = Date.now();
-    const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-    const path = `logos/${session.user.businessId}/${timestamp}-${safeName}`;
-
-    // Upload using Service Role (bypasses RLS for write)
-    const { error } = await supabaseAdmin.storage
-      .from('business-assets')
-      .upload(path, buffer, {
-        contentType: file.type,
-        upsert: true
-      });
-
-    if (error) {
-      console.error('Supabase storage upload error:', error);
-      throw error;
+    // Validate file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      return NextResponse.json(
+        { error: 'File size must be less than 2MB' },
+        { status: 400 }
+      );
     }
 
-    // Get Public URL
-    const { data: { publicUrl } } = supabaseAdmin.storage
-      .from('business-assets')
-      .getPublicUrl(path);
+    // Convert to base64
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+    const base64 = buffer.toString('base64');
+    const dataUrl = `data:${file.type};base64,${base64}`;
 
-    return NextResponse.json({ url: publicUrl });
+    return NextResponse.json({ url: dataUrl });
 
   } catch (error) {
     console.error('Logo upload error:', error);
