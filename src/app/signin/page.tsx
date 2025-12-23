@@ -28,7 +28,7 @@ export default function SignInPage() {
       if (result?.error) {
         setError(result.error);
       } else {
-        window.location.href = '/dashboard';
+        window.location.href = '/';
       }
     } catch (err) {
       setError('An error occurred during sign in');
@@ -144,6 +144,16 @@ export default function SignInPage() {
                     )}
                 </button>
             </form>
+            
+            {/* Forgot Password Link */}
+            <div className="text-center mt-4">
+                <Link 
+                    href="/auth/forgot-password" 
+                    className="text-sm text-indigo-600 hover:text-indigo-500 hover:underline"
+                >
+                    Forgot your password?
+                </Link>
+            </div>
             
             <div className="pt-8 border-t border-gray-100">
                 <p className="text-xs text-center text-gray-500">
