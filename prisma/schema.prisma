@@ -218,11 +218,15 @@ model User {
   emailVerified DateTime?
   image         String?
   businessId    String
+  resetPinId    String?
+  resetPinExpiry DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   accounts      Account[]
   sessions      Session[]
   business      Business  @relation(fields: [businessId], references: [id])
+
+  @@index([resetPinId])
 }
 
 model Account {
