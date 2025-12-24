@@ -6,6 +6,7 @@ import { useSession } from 'next-auth/react';
 import { Menu } from 'lucide-react';
 import { MainNav } from './MainNav';
 import { UserNav } from './UserNav';
+import { useInactivityTimeout } from '@/hooks/useInactivityTimeout';
 import type { Session } from 'next-auth';
 
 export function AuthenticatedLayout({
@@ -18,16 +19,23 @@ export function AuthenticatedLayout({
   const router = useRouter();
   const isAuthPage = pathname?.startsWith('/signin') || pathname?.startsWith('/signup') || pathname?.startsWith('/auth');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  
+  // Enable inactivity timeout for logged-in users
+  useInactivityTimeout();
 
   useEffect(() => {
     if (status === 'loading') return;
 
+    // Allow password reset pages for both logged-in and logged-out users
+    const isPasswordResetPage = pathname?.startsWith('/auth/forgot-password') || pathname?.startsWith('/auth/reset-password');
+    
     if (!session && !isAuthPage) {
       router.push('/signin');
-    } else if (session && isAuthPage) {
-      router.push('/dashboard');
+    } else if (session && (pathname?.startsWith('/signin') || pathname?.startsWith('/signup'))) {
+      // Only redirect signin/signup if already logged in, not password reset pages
+      router.push('/');
     }
-  }, [session, status, isAuthPage, router]);
+  }, [session, status, isAuthPage, pathname, router]);
 
   // Close mobile menu when route changes
   useEffect(() => {
