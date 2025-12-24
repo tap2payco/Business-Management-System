@@ -16,7 +16,7 @@ export function AuthenticatedLayout({
   const { data: session, status } = useSession();
   const pathname = usePathname();
   const router = useRouter();
-  const isAuthPage = pathname?.startsWith('/signin') || pathname?.startsWith('/signup');
+  const isAuthPage = pathname?.startsWith('/signin') || pathname?.startsWith('/signup') || pathname?.startsWith('/auth');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
