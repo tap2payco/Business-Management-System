@@ -213,7 +213,7 @@ model User {
   email         String?   @unique
   phone         String    @unique
   password      String
-  role          String    @default("owner")
+  role          UserRole  @default(MEMBER)
   isSuperAdmin  Boolean   @default(false)
   emailVerified DateTime?
   image         String?
@@ -227,6 +227,16 @@ model User {
   business      Business  @relation(fields: [businessId], references: [id])
 
   @@index([resetPinId])
+}
+
+enum UserRole {
+  OWNER              // Full access to everything
+  MANAGER            // Almost full access, can't delete business
+  CHIEF_ACCOUNTANT   // Financial oversight, reports, approvals
+  ACCOUNTANT         // Create/edit financial records
+  CASHIER            // Payments and receipts only
+  STOREKEEPER        // Inventory management only
+  MEMBER             // Read-only access
 }
 
 model Account {
