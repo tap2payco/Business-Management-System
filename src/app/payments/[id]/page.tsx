@@ -1,12 +1,24 @@
 
 import { prisma } from '@/lib/prisma';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { formatCurrency } from '@/lib/formatStats';
+import { auth } from '@/auth';
 
 export default async function ViewPaymentPage({ params }: { params: Promise<{ id: string }> }) {
+  const session = await auth();
+  
+  if (!session?.user?.businessId) {
+    redirect('/login');
+  }
+
   const { id } = await params;
-  const payment = await prisma.payment.findUnique({
-    where: { id },
+  const payment = await prisma.payment.findFirst({
+    where: { 
+      id,
+      invoice: {
+        businessId: session.user.businessId
+      }
+    },
     include: {
         invoice: {
             include: { customer: true }
