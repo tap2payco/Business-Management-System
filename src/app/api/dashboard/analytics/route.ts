@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
       // 2. Revenue Current Month (Payments)
       prisma.payment.aggregate({
         where: {
-          businessId,
+          invoice: { businessId },
           date: { gte: startOfMonth }
         },
         _sum: { amount: true }
@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
       // 3. Revenue Last Month
       prisma.payment.aggregate({
         where: {
-          businessId,
+          invoice: { businessId },
           date: { gte: lastMonthStart, lte: lastMonthEnd }
         },
         _sum: { amount: true }
@@ -72,7 +72,7 @@ export async function GET(req: NextRequest) {
 
       // 6. Total All-time Revenue
       prisma.payment.aggregate({
-        where: { businessId },
+        where: { invoice: { businessId } },
         _sum: { amount: true }
       }),
 
@@ -93,7 +93,7 @@ export async function GET(req: NextRequest) {
       
       // Counts for percentage calc or general stats
       prisma.invoice.count({ where: { businessId } }),
-      prisma.payment.count({ where: { businessId } }),
+      prisma.payment.count({ where: { invoice: { businessId } } }),
       prisma.expense.count({ where: { businessId } })
     ]);
 
@@ -118,7 +118,7 @@ export async function GET(req: NextRequest) {
       const monthEnd = new Date(d.getFullYear(), d.getMonth() + 1, 0);
       
       const monRev = await prisma.payment.aggregate({
-        where: { businessId, date: { gte: monthStart, lte: monthEnd } },
+        where: { invoice: { businessId }, date: { gte: monthStart, lte: monthEnd } },
         _sum: { amount: true }
       });
       const monExp = await prisma.expense.aggregate({
@@ -158,7 +158,7 @@ export async function GET(req: NextRequest) {
         include: { customer: true }
       }),
       prisma.payment.findMany({
-        where: { businessId },
+        where: { invoice: { businessId } },
         take: 5,
         orderBy: { date: 'desc' },
         include: { invoice: { include: { customer: true } } }
