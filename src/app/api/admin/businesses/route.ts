@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
           }
         },
         users: {
-          where: { role: 'owner' },
+          where: { role: 'OWNER' },
           select: {
             name: true,
             phone: true

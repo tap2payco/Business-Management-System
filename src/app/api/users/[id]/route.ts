@@ -35,7 +35,7 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
     const { role } = await req.json();
 
     // Validate role
-    if (!['admin', 'member'].includes(role)) {
+    if (!['MANAGER', 'CHIEF_ACCOUNTANT', 'ACCOUNTANT', 'CASHIER', 'STOREKEEPER', 'MEMBER'].includes(role)) {
       return NextResponse.json(
         { error: 'Invalid role' },
         { status: 400 }

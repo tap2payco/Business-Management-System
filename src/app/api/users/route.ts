@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Validate role
-    if (!['admin', 'member'].includes(role)) {
+    if (!['MANAGER', 'CHIEF_ACCOUNTANT', 'ACCOUNTANT', 'CASHIER', 'STOREKEEPER', 'MEMBER'].includes(role)) {
       return NextResponse.json(
         { error: 'Invalid role. Only admin and member roles can be invited' },
         { status: 400 }
