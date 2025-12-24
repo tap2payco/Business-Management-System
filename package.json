@@ -33,7 +33,7 @@
     "puppeteer-core": "^24.32.1",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
-    "recharts": "^3.3.0",
+    "recharts": "^3.6.0",
     "tailwindcss": "^3.4.14",
     "use-debounce": "^10.0.6",
     "zod": "^3.25.76"

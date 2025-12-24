@@ -572,9 +572,21 @@ export default function SettingsPage() {
                     onChange={e => setInviteForm({ ...inviteForm, role: e.target.value })}
                     className="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500"
                   >
-                    <option value="admin">Admin - Can manage data</option>
-                    <option value="member">Member - Read-only access</option>
+                    <option value="MANAGER">Manager - Can manage all operations</option>
+                    <option value="CHIEF_ACCOUNTANT">Chief Accountant - Financial oversight & reports</option>
+                    <option value="ACCOUNTANT">Accountant - Create & edit financial records</option>
+                    <option value="CASHIER">Cashier - Record payments & issue receipts</option>
+                    <option value="STOREKEEPER">Storekeeper - Manage inventory & stock</option>
+                    <option value="MEMBER">Member - Read-only access</option>
                   </select>
+                  <p className="mt-1 text-xs text-gray-500">
+                    {inviteForm.role === 'MANAGER' && 'Full access except user management'}
+                    {inviteForm.role === 'CHIEF_ACCOUNTANT' && 'View all data, approve invoices, manage expenses'}
+                    {inviteForm.role === 'ACCOUNTANT' && 'Create invoices, expenses, and quotes'}
+                    {inviteForm.role === 'CASHIER' && 'Process payments and receipts only'}
+                    {inviteForm.role === 'STOREKEEPER' && 'Manage items and inventory stock levels'}
+                    {inviteForm.role === 'MEMBER' && 'Can only view business data'}
+                  </p>
                 </div>
               </div>
               <button
