@@ -1,7 +1,7 @@
 
 import { prisma } from './prisma';
 
-export async function getNextNumber(kind: 'invoice' | 'receipt' | 'quote') {
+export async function getNextNumber(kind: 'invoice' | 'receipt' | 'quote' | 'item') {
   const date = new Date();
   const year = date.getFullYear();
   const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -21,6 +21,7 @@ export async function getNextNumber(kind: 'invoice' | 'receipt' | 'quote') {
   if (kind === 'invoice') prefix = 'INV';
   else if (kind === 'receipt') prefix = 'RCT';
   else if (kind === 'quote') prefix = 'QT';
+  else if (kind === 'item') prefix = 'ITEM';
 
   return `${prefix}-${dateStr}-${pad(seq)}`;
 }

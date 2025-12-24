@@ -14,7 +14,7 @@ const itemSchema = z.object({
   taxRate: z.number().min(0).max(1),
   unit: z.string().default('pcs'),
   stock: z.number().int().min(0).optional(),
-  serialNumber: z.string().optional().nullable(),
+  // serialNumber is auto-generated, not user input
 });
 
 export async function GET() {
@@ -76,9 +76,14 @@ export async function POST(req: Request) {
     const data = await req.json();
     const validatedData = itemSchema.parse(data);
 
+    // Generate serial number
+    const { getNextNumber } = await import('@/lib/numbering');
+    const serialNumber = await getNextNumber('item');
+
     const item = await prisma.item.create({
       data: {
         ...validatedData,
+        serialNumber,
         businessId: session.user.businessId
       }
     });

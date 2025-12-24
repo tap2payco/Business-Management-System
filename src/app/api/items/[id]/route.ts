@@ -12,7 +12,7 @@ const itemSchema = z.object({
   type: z.enum(['GOODS', 'SERVICE']).optional(),
   stock: z.number().int().min(0).optional(),
   unit: z.string().optional(),
-  serialNumber: z.string().optional().nullable(),
+  // serialNumber is auto-generated and not editable
 });
 
 export async function GET(
