@@ -175,7 +175,7 @@ export async function GET(req: NextRequest) {
         id: i.id,
         type: 'invoice',
         description: `Invoice #${i.number} for ${i.customer.name}`,
-        amount: Number(i.total), // Corrected: Invoice has 'total' not just 'total' property name was confusing in lint error. It's 'grandTotal' usually or 'total'. Checking schema...
+        amount: Number(i.grandTotal),
         date: i.createdAt
       })),
       ...latestPayments.map(p => ({
