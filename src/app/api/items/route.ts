@@ -14,6 +14,7 @@ const itemSchema = z.object({
   taxRate: z.number().min(0).max(1),
   unit: z.string().default('pcs'),
   stock: z.number().int().min(0).optional(),
+  serialNumber: z.string().optional().nullable(),
 });
 
 export async function GET() {
@@ -41,6 +42,7 @@ export async function GET() {
         description: true,
         unit: true,
         stock: true,
+        serialNumber: true,
         unitPrice: true,
         taxRate: true,
         createdAt: true,

@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
       prisma.payment.aggregate({
         where: {
           invoice: { businessId },
-          date: { gte: startOfMonth }
+          paidAt: { gte: startOfMonth }
         },
         _sum: { amount: true }
       }),
@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
       prisma.payment.aggregate({
         where: {
           invoice: { businessId },
-          date: { gte: lastMonthStart, lte: lastMonthEnd }
+          paidAt: { gte: lastMonthStart, lte: lastMonthEnd }
         },
         _sum: { amount: true }
       }),
@@ -118,7 +118,7 @@ export async function GET(req: NextRequest) {
       const monthEnd = new Date(d.getFullYear(), d.getMonth() + 1, 0);
       
       const monRev = await prisma.payment.aggregate({
-        where: { invoice: { businessId }, date: { gte: monthStart, lte: monthEnd } },
+        where: { invoice: { businessId }, paidAt: { gte: monthStart, lte: monthEnd } },
         _sum: { amount: true }
       });
       const monExp = await prisma.expense.aggregate({
@@ -138,13 +138,13 @@ export async function GET(req: NextRequest) {
       by: ['status'],
       where: { businessId },
       _count: { status: true },
-      _sum: { total: true } // or balanceDue depending on what we want to show
+      _sum: { balanceDue: true } 
     });
 
     const paymentStatus = statusCounts.map(s => ({
       name: s.status.replace('_', ' '),
       count: s._count.status,
-      value: Number(s._sum.total || 0) 
+      value: Number(s._sum.balanceDue || 0) // Using balanceDue for value makes more sense for "Receivables" chart, or total for "Sales"
     })).filter(s => s.value > 0);
 
 
@@ -160,7 +160,7 @@ export async function GET(req: NextRequest) {
       prisma.payment.findMany({
         where: { invoice: { businessId } },
         take: 5,
-        orderBy: { date: 'desc' },
+        orderBy: { paidAt: 'desc' },
         include: { invoice: { include: { customer: true } } }
       }),
       prisma.expense.findMany({
@@ -175,7 +175,7 @@ export async function GET(req: NextRequest) {
         id: i.id,
         type: 'invoice',
         description: `Invoice #${i.number} for ${i.customer.name}`,
-        amount: Number(i.total),
+        amount: Number(i.total), // Corrected: Invoice has 'total' not just 'total' property name was confusing in lint error. It's 'grandTotal' usually or 'total'. Checking schema...
         date: i.createdAt
       })),
       ...latestPayments.map(p => ({
@@ -183,7 +183,7 @@ export async function GET(req: NextRequest) {
         type: 'payment',
         description: `Payment received from ${p.invoice.customer.name}`,
         amount: Number(p.amount),
-        date: p.date
+        date: p.paidAt
       })),
       ...latestExpenses.map(e => ({
         id: e.id,

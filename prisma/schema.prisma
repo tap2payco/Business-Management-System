@@ -113,6 +113,7 @@ model Item {
   businessId   String
   type         ItemType      @default(GOODS)
   name         String
+  serialNumber String?
   description  String?
   unit         String        @default("pcs")
   stock        Int           @default(0)
