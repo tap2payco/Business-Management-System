@@ -611,8 +611,8 @@ export default function SettingsPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          user.role === 'owner' ? 'bg-purple-100 text-purple-800' :
-                          user.role === 'admin' ? 'bg-blue-100 text-blue-800' :
+                          user.role === 'OWNER' ? 'bg-purple-100 text-purple-800' :
+                          user.role === 'MANAGER' ? 'bg-blue-100 text-blue-800' :
                           'bg-gray-100 text-gray-800'
                         }`}>
                           {getRoleName(user.role)}

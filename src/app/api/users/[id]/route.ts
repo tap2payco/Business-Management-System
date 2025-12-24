@@ -57,7 +57,7 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
     }
 
     // Prevent changing owner role
-    if (targetUser.role === 'owner') {
+    if (targetUser.role === 'OWNER') {
       return NextResponse.json(
         { error: 'Cannot change the role of the business owner' },
         { status: 400 }
@@ -124,7 +124,7 @@ export async function DELETE(req: NextRequest, { params }: RouteParams) {
     }
 
     // Prevent removing owner
-    if (targetUser.role === 'owner') {
+    if (targetUser.role === 'OWNER') {
       return NextResponse.json(
         { error: 'Cannot remove the business owner' },
         { status: 400 }

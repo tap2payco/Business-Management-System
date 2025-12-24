@@ -7,8 +7,8 @@ const INACTIVITY_TIMEOUT = 15 * 60 * 1000; // 15 minutes in milliseconds
 const WARNING_TIMEOUT = 14 * 60 * 1000; // 14 minutes - show warning 1 minute before logout
 
 export function useInactivityTimeout() {
-  const timeoutRef = useRef<NodeJS.Timeout>();
-  const warningTimeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const warningTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const resetTimer = () => {
     // Clear existing timers

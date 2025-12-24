@@ -46,7 +46,7 @@ export async function GET(
         items: business._count.items,
         expenses: business._count.expenses
       },
-      owner: business.users.find(u => u.role === 'owner') || business.users[0] || {}
+      owner: business.users.find(u => u.role === 'OWNER') || business.users[0] || {}
     };
 
     return NextResponse.json(data);
